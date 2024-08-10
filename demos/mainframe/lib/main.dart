@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'new_page.dart'; // Import the new page
 import 'clock.dart'; // Import the Clock widget
+import 'help.dart'; // Import the HelpPage widget
+import 'network.dart'; // Import the NetworkSettingsPage widget
+import 'print.dart'; // Import the PrintSettingsPage widget
+import 'settings.dart'; // Import the CommonSettingsPage widget
 
 void main() {
   runApp(MyApp());
@@ -23,13 +27,11 @@ class MyApp extends StatelessWidget {
 class IconsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // final iconItems = _generateIconItems(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          // child: Image.asset('assets/apple_icon.png'),
           child: Icon(Icons.apple, size: 48.0), // Set the icon size to 48.0
         ),
         title: Clock(), // Replace with the Clock widget
@@ -38,28 +40,44 @@ class IconsPage extends StatelessWidget {
             icon: Icon(Icons.help),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
-              // Handle action for 'Online Help'
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HelpPage()),
+              );
             },
           ),
           IconButton(
             icon: Icon(Icons.print),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
-              // Handle action for 'Print Management'
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PrintSettingsPage()),
+              );
             },
           ),
           IconButton(
             icon: Icon(Icons.network_check),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
-              // Handle action for 'Network Management'
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
+              );
             },
           ),
           IconButton(
             icon: Icon(Icons.settings),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
-              // Handle action for 'Settings'
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CommonSettingsPage(
+                          shopName: 'My Shop',
+                          bannerImage: 'https://example.com/shop_banner.jpg',
+                        )),
+              );
             },
           ),
         ],
@@ -73,7 +91,8 @@ class IconsPage extends StatelessWidget {
             crossAxisSpacing: 10.0, // 10 pixels margin between buttons
             mainAxisSpacing: 10.0, // 10 pixels margin between buttons
             padding: EdgeInsets.all(10.0), // Padding around the grid
-            children: _generateIconItems(context, buttonSize), // Provide the correct number of arguments
+            children: _generateIconItems(
+                context, buttonSize), // Provide the correct number of arguments
           );
         },
       ),
@@ -162,6 +181,10 @@ class IconsPage extends StatelessWidget {
             child: Text(
               label,
               overflow: TextOverflow.ellipsis, // Handle overflow text
+              style: TextStyle(
+                fontWeight: FontWeight.bold, // Bold font
+                fontSize: 32.0, // Twice the original font size
+              ),
             ),
           ),
         ],
@@ -205,6 +228,10 @@ class IconItem extends StatelessWidget {
             child: Text(
               label,
               overflow: TextOverflow.ellipsis, // Handle overflow text
+              style: TextStyle(
+                fontWeight: FontWeight.bold, // Bold font
+                fontSize: 32.0, // Twice the original font size
+              ),
             ),
           ),
         ],
