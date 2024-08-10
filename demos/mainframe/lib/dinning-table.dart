@@ -25,7 +25,6 @@ class TableList {
 }
 
 int tableAccount = 1;
-// int tableCount = 20;
 
 TableList tableList = TableList();
 
@@ -52,7 +51,7 @@ class TableStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     Color color = Colors.grey;
     switch (status) {
-      case 'Available': // Changed from 'Close' to 'Available'
+      case 'Available':
         color = Colors.green;
         break;
       case 'Reserved':
@@ -93,25 +92,59 @@ class DinningTablesPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Dining Tables'),
       ),
-      body: ListView.builder(
+      body: GridView.builder(
+        padding: EdgeInsets.all(16),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 6, // 6 items per line
+          crossAxisSpacing: 16, // Horizontal margin
+          mainAxisSpacing: 16, // Vertical margin
+        ),
         itemCount: tableList.tables.length,
         itemBuilder: (context, index) {
           final table = tableList.tables[index];
-          return ListTile(
-            title: Text(table.tableNickname),
-            subtitle: Text('Seats: ${table.numberOfSeats}'),
-            trailing: SizedBox(
-              width: 100, // Constrain the width of the trailing widget
-              child: TableStatus(
-                status: table.tableStatus,
-                onNavigate: () {
-                  // Navigate to the dining tables page
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DinningTablesPage()),
-                  );
-                },
+          return GestureDetector(
+            onTap: () {
+              // Navigate to the dining tables page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DinningTablesPage()),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 100, // Define a fixed width
+                    height: 100, // Define a fixed height
+                    child: FractionallySizedBox(
+                      widthFactor:
+                          0.6, // Scale the image to 0.6 of the button's width
+                      heightFactor:
+                          0.6, // Scale the image to 0.6 of the button's height
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/dinning-table.jpg'),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    table.tableNickname,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      backgroundColor: Colors.black54,
+                    ),
+                  ),
+                ],
               ),
             ),
           );
