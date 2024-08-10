@@ -88,6 +88,9 @@ class TableStatus extends StatelessWidget {
 class DinningTablesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemSize = screenWidth / 8; // Adjust the divisor to change the size
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Dining Tables'),
@@ -102,6 +105,28 @@ class DinningTablesPage extends StatelessWidget {
         itemCount: tableList.tables.length,
         itemBuilder: (context, index) {
           final table = tableList.tables[index];
+          Color color;
+
+          switch (table.tableStatus) {
+            case 'Available':
+              color = Colors.green;
+              break;
+            case 'Reserved':
+              color = Colors.yellow;
+              break;
+            case 'Occupied':
+              color = Colors.red;
+              break;
+            case 'Cleaning':
+              color = Colors.blue;
+              break;
+            case 'Maintenance':
+              color = Colors.purple;
+              break;
+            default:
+              color = Colors.grey;
+          }
+
           return GestureDetector(
             onTap: () {
               // Navigate to the dining tables page
@@ -112,14 +137,15 @@ class DinningTablesPage extends StatelessWidget {
             },
             child: Container(
               decoration: BoxDecoration(
+                color: color,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: 100, // Define a fixed width
-                    height: 100, // Define a fixed height
+                    width: itemSize, // Adjust size based on screen width
+                    height: itemSize, // Adjust size based on screen width
                     child: FractionallySizedBox(
                       widthFactor:
                           0.6, // Scale the image to 0.6 of the button's width
@@ -141,7 +167,7 @@ class DinningTablesPage extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      backgroundColor: Colors.black54,
+                      backgroundColor: color.withOpacity(0.7),
                     ),
                   ),
                 ],
