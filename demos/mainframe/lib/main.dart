@@ -5,8 +5,11 @@ import 'help.dart'; // Import the HelpPage widget
 import 'network.dart'; // Import the NetworkSettingsPage widget
 import 'print.dart'; // Import the PrintSettingsPage widget
 import 'settings.dart'; // Import the CommonSettingsPage widget
+import 'dinning-table.dart'; // Import the DinningTable widget
 
 void main() {
+  // Initialize tables
+  addTables(30); // Add 10 tables for example
   runApp(MyApp());
 }
 
@@ -114,6 +117,14 @@ class IconsPage extends StatelessWidget {
     );
   }
 
+  void handleDinningTablePressed(BuildContext context) {
+    print('Dinning Table Icon pressed');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DinningTablesPage()),
+    );
+  }
+
   List<Widget> _generateIconItems(BuildContext context, double buttonSize) {
     return [
       _createIconItem(Icon(Icons.people, size: buttonSize * 0.4), 'People',
@@ -129,7 +140,7 @@ class IconsPage extends StatelessWidget {
               width: buttonSize * 0.4, height: buttonSize * 0.4),
           '桌台',
           Color.fromARGB(255, 197, 140, 179),
-          () => handlePersonOutlinePressed(context),
+          () => handleDinningTablePressed(context),
           buttonSize),
       _createIconItem(
           Image.asset('assets/crown.jpg',
