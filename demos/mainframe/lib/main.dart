@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'new_page.dart'; // Import the new page
 import 'clock.dart'; // Import the Clock widget
 import 'help.dart'; // Import the HelpPage widget
@@ -6,10 +8,25 @@ import 'network.dart'; // Import the NetworkSettingsPage widget
 import 'print.dart'; // Import the PrintSettingsPage widget
 import 'settings.dart'; // Import the CommonSettingsPage widget
 import 'dinning-table.dart'; // Import the DinningTable widget
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+
+  WindowOptions windowOptions = WindowOptions(
+    title: 'My App',
+    size: Size(1024, 768),
+    minimumSize: Size(800, 600),
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+
   // Initialize tables
   addTables(30); // Add 10 tables for example
+
   runApp(MyApp());
 }
 
@@ -88,9 +105,9 @@ class IconsPage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           double buttonSize = (constraints.maxWidth - 70) /
-              8; // Calculate button size based on window width
+              6; // Calculate button size based on window width
           return GridView.count(
-            crossAxisCount: 8, // 8 icons per line
+            crossAxisCount: 6, // 6 icons per line
             crossAxisSpacing: 10.0, // 10 pixels margin between buttons
             mainAxisSpacing: 10.0, // 10 pixels margin between buttons
             padding: EdgeInsets.all(10.0), // Padding around the grid
@@ -194,7 +211,7 @@ class IconsPage extends StatelessWidget {
               overflow: TextOverflow.ellipsis, // Handle overflow text
               style: TextStyle(
                 fontWeight: FontWeight.bold, // Bold font
-                fontSize: 32.0, // Twice the original font size
+                fontSize: 16.0, // Adjusted font size for better fit
               ),
             ),
           ),
@@ -225,7 +242,7 @@ class IconItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min, // Ensure the column takes minimum space
         children: [
           Container(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: backgroundColor,
               border: Border.all(color: Colors.black), // Rectangular border
@@ -241,7 +258,7 @@ class IconItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis, // Handle overflow text
               style: TextStyle(
                 fontWeight: FontWeight.bold, // Bold font
-                fontSize: 32.0, // Twice the original font size
+                fontSize: 12.0, // Adjusted font size for better fit
               ),
             ),
           ),
