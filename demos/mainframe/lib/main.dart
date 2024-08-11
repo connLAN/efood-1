@@ -3,7 +3,7 @@ import 'package:window_manager/window_manager.dart';
 import 'icons_page.dart'; // Import the IconsPage
 import 'utils.dart'; // Import utility functions
 import 'clock.dart'; // Import the Clock widget
-import 'dinning-table.dart'; // Import the DinningTablesPage
+import 'dinning_table.dart'; // Import the DinningTablesPage
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

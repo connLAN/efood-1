@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
+import 'ordering_page.dart'; // Import the OrderingPage
 
-// Assuming you have a Table class defined somewhere
 class Table {
   final String tableNumber;
   final String tableNickname;
-  final int numberOfSeats;
-  final String tableStatus;
+  String tableStatus; // Make tableStatus mutable
+  VoidCallback? orderPlaced; // Add orderPlaced field
 
   Table({
     required this.tableNumber,
     required this.tableNickname,
-    required this.numberOfSeats,
     required this.tableStatus,
   });
 }
 
-// Assuming you have a TableList class defined somewhere
 class TableList {
   final List<Table> tables = [];
 
@@ -28,19 +26,16 @@ int tableAccount = 1;
 
 TableList tableList = TableList();
 
-// Add some tables to the table list
 void addTables(int tableCount) {
   for (int i = 1; i <= tableCount; i++) {
     tableList.addTable(Table(
       tableNumber: 'T${tableAccount++}',
       tableNickname: 'Table $i',
-      numberOfSeats: 4, // Assuming each table has 4 seats
-      tableStatus: 'Available', // Setting the status to 'Available'
+      tableStatus: 'Available',
     ));
   }
 }
 
-// TableStatus class
 class TableStatus extends StatelessWidget {
   final String status;
   final VoidCallback onNavigate;
@@ -84,12 +79,16 @@ class TableStatus extends StatelessWidget {
   }
 }
 
-// DinningTablesPage widget
-class DinningTablesPage extends StatelessWidget {
+class DinningTablesPage extends StatefulWidget {
+  @override
+  _DinningTablesPageState createState() => _DinningTablesPageState();
+}
+
+class _DinningTablesPageState extends State<DinningTablesPage> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final itemSize = screenWidth / 8; // Adjust the divisor to change the size
+    final itemSize = screenWidth / 8;
 
     return Scaffold(
       appBar: AppBar(
@@ -98,9 +97,9 @@ class DinningTablesPage extends StatelessWidget {
       body: GridView.builder(
         padding: EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 6, // 6 items per line
-          crossAxisSpacing: 16, // Horizontal margin
-          mainAxisSpacing: 16, // Vertical margin
+          crossAxisCount: 6,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
         ),
         itemCount: tableList.tables.length,
         itemBuilder: (context, index) {
@@ -129,11 +128,24 @@ class DinningTablesPage extends StatelessWidget {
 
           return GestureDetector(
             onTap: () {
-              // Navigate to the dining tables page
+              setState(() {
+                table.tableStatus = 'Open';
+              });
+
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DinningTablesPage()),
-              );
+                MaterialPageRoute(
+                  builder: (context) => OrderingPage(
+                    tableIndex: table.tableNumber,
+                    tableNickName: table.tableNickname,
+                    onOrderPlaced: table.orderPlaced ?? () {},
+                  ),
+                ),
+              ).then((_) {
+                setState(() {
+                  // Update the state when coming back from the OrderingPage
+                });
+              });
             },
             child: Container(
               decoration: BoxDecoration(
@@ -144,13 +156,11 @@ class DinningTablesPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    width: itemSize, // Adjust size based on screen width
-                    height: itemSize, // Adjust size based on screen width
+                    width: itemSize,
+                    height: itemSize,
                     child: FractionallySizedBox(
-                      widthFactor:
-                          0.6, // Scale the image to 0.6 of the button's width
-                      heightFactor:
-                          0.6, // Scale the image to 0.6 of the button's height
+                      widthFactor: 0.6,
+                      heightFactor: 0.6,
                       child: Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(

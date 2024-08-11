@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'icons_page.dart'; // Import the IconsPage class
-import 'dinning-table.dart'; // Import the DinningTablesPage class
+import 'dinning_table.dart'; // Import the DinningTablesPage class
 import 'new_page.dart'; // Import the NewPage class
 
 void onPressed(BuildContext context) {
