@@ -16,12 +16,14 @@ class _OrderingPageState extends State<OrderingPage> {
   Map<String, int> selectedDishesQuantities = {};
   List<Map<String, dynamic>> menu = [];
   Set<String> selectedDishes = {};
+  String tableStatus = 'available'; // Default table status
 
   @override
   void initState() {
     super.initState();
     loadMenu();
     loadOrders();
+    loadTableStatus();
   }
 
   Future<void> loadMenu() async {
@@ -50,10 +52,21 @@ class _OrderingPageState extends State<OrderingPage> {
     }
   }
 
+  Future<void> loadTableStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedStatus = prefs.getString('table_status_${widget.tableNumber}');
+    if (savedStatus != null) {
+      setState(() {
+        tableStatus = savedStatus;
+      });
+    }
+  }
+
   Future<void> saveOrders() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
         'orders_${widget.tableNumber}', json.encode(selectedDishesQuantities));
+    await prefs.setString('table_status_${widget.tableNumber}', tableStatus);
   }
 
   void _toggleSelection(String dishName) {
@@ -106,13 +119,20 @@ class _OrderingPageState extends State<OrderingPage> {
     return total;
   }
 
+  void _updateTableStatus(String status) {
+    setState(() {
+      tableStatus = status;
+    });
+    saveOrders(); // Save the updated status
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: menu.length,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Menu'),
+          title: Text('Menu - Table ${widget.tableNumber}'),
           bottom: TabBar(
             isScrollable: true,
             tabs: menu.map((category) {
@@ -209,6 +229,15 @@ class _OrderingPageState extends State<OrderingPage> {
               flex: 1,
               child: Column(
                 children: [
+                  Text('Table Status: $tableStatus'),
+                  ElevatedButton(
+                    onPressed: () => _updateTableStatus('occupied'),
+                    child: Text('Mark as Occupied'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _updateTableStatus('available'),
+                    child: Text('Mark as Available'),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {});
