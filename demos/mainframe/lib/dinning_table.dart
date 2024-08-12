@@ -86,6 +86,28 @@ class DinningTablesPage extends StatefulWidget {
 }
 
 class _DinningTablesPageState extends State<DinningTablesPage> {
+  @override
+  void initState() {
+    super.initState();
+    loadTableStatuses();
+  }
+
+  Future<void> loadTableStatuses() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      for (var table in tableList.tables) {
+        table.tableStatus =
+            prefs.getString('table_status_${table.tableNumber}') ?? 'Available';
+      }
+    });
+  }
+
+  Future<void> saveTableStatus(Table table) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        'table_status_${table.tableNumber}', table.tableStatus);
+  }
+
   Future<void> clearAllOrders() async {
     final prefs = await SharedPreferences.getInstance();
     for (var table in tableList.tables) {
@@ -152,6 +174,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
             onTap: () {
               setState(() {
                 table.tableStatus = 'Open';
+                saveTableStatus(table);
               });
 
               Navigator.push(

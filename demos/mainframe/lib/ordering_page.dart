@@ -32,7 +32,7 @@ class _OrderingPageState extends State<OrderingPage> {
       setState(() {
         menu = List<Map<String, dynamic>>.from(data);
         menu.insert(0, {
-          'category': 'All',
+          'category': '全部',
           'dishes': menu.expand((category) => category['dishes']).toList(),
         });
       });
@@ -66,8 +66,7 @@ class _OrderingPageState extends State<OrderingPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
         'orders_${widget.tableNumber}', json.encode(selectedDishesQuantities));
-    await prefs.setString(
-        'table_status_${widget.tableNumber}', tableStatus);
+    await prefs.setString('table_status_${widget.tableNumber}', tableStatus);
   }
 
   void _toggleSelection(String dishName) {
@@ -119,11 +118,12 @@ class _OrderingPageState extends State<OrderingPage> {
     return total;
   }
 
-  void _updateTableStatus(String status) {
+  Future<void> _updateTableStatus(String status) async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
       tableStatus = status;
     });
-    saveOrders(); // Save the updated status
+    await prefs.setString('table_status_${widget.tableNumber}', status);
   }
 
   @override
@@ -230,20 +230,7 @@ class _OrderingPageState extends State<OrderingPage> {
               child: Column(
                 children: [
                   Text('Table Status: $tableStatus'),
-                  ElevatedButton(
-                    onPressed: () => _updateTableStatus('occupied'),
-                    child: Text('Mark as Occupied'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => _updateTableStatus('available'),
-                    child: Text('Mark as Available'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    child: Text('Order Now'),
-                  ),
+
                   Expanded(
                     child: ListView(
                       children: selectedDishesQuantities.entries.map((entry) {
@@ -259,6 +246,8 @@ class _OrderingPageState extends State<OrderingPage> {
                       }).toList(),
                     ),
                   ),
+
+                  // total dishes and amount
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -267,6 +256,18 @@ class _OrderingPageState extends State<OrderingPage> {
                         Text(
                             'Total Amount: \$${_getTotalAmount().toStringAsFixed(2)}'),
                       ],
+                    ),
+                  ),
+
+                  // Add a button to update the table status
+                  Container(
+                    margin: const EdgeInsets.only(
+                        bottom: 16.0), // Add bottom margin
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {});
+                      },
+                      child: Text('立刻下单！'),
                     ),
                   ),
                 ],
