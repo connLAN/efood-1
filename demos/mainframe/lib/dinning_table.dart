@@ -152,7 +152,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
 
           switch (table.tableStatus) {
             case 'Available':
-              color = Colors.green;
+              color = const Color.fromARGB(255, 246, 204, 204);
               break;
             case 'Reserved':
               color = Colors.yellow;
@@ -167,7 +167,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
               color = Colors.purple;
               break;
             default:
-              color = Colors.grey;
+              color = const Color.fromARGB(255, 129, 169, 122);
           }
 
           return GestureDetector(

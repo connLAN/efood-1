@@ -11,7 +11,7 @@ void main() async {
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = WindowOptions(
-    title: 'My App',
+    title: '招财猫餐饮收银系统',
     size: Size(1024, 768),
     minimumSize: Size(800, 600),
   );
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '金财神餐饮收银系统',
+      title: '招财猫餐饮收银系统',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
