@@ -4,6 +4,7 @@ import 'help.dart'; // Import the HelpPage
 import 'print_settings.dart'; // Import the PrintSettingsPage
 import 'network_settings.dart'; // Import the NetworkSettingsPage
 import 'settings.dart'; // Import the CommonSettingsPage
+import 'clock.dart'; // Import the Clock widget
 
 class IconsPage extends StatelessWidget {
   @override
@@ -15,7 +16,7 @@ class IconsPage extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Icon(Icons.apple, size: 48.0), // Set the icon size to 48.0
         ),
-        title: Text('Icons Page'), // Replace with the Clock widget if needed
+        title: Text('${Clock().getCurrentDateTimeInChineseStyle()}'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.help),

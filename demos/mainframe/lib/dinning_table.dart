@@ -31,7 +31,7 @@ void addTables(int tableCount) {
   for (int i = 1; i <= tableCount; i++) {
     tableList.addTable(Table(
       tableNumber: 'T${tableAccount++}',
-      tableNickname: 'Table $i',
+      tableNickname: '桌台 $i',
       tableStatus: 'Available',
     ));
   }
@@ -48,7 +48,7 @@ class TableStatus extends StatelessWidget {
     Color color = Colors.grey;
     switch (status) {
       case 'Available':
-        color = Colors.green;
+        color = const Color.fromARGB(255, 246, 246, 246);
         break;
       case 'Reserved':
         color = Colors.yellow;
@@ -63,7 +63,7 @@ class TableStatus extends StatelessWidget {
         color = Colors.purple;
         break;
       default:
-        color = Colors.grey;
+        color = const Color.fromARGB(255, 233, 231, 109);
     }
     return GestureDetector(
       onTap: onNavigate,
@@ -123,7 +123,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dining Tables'),
+        title: Text('桌台管理'),
         actions: [
           IconButton(
             icon: Icon(Icons.delete),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:intl/date_symbol_data_local.dart'; // Import intl package
 import 'icons_page.dart'; // Import the IconsPage
 import 'utils.dart'; // Import utility functions
 import 'clock.dart'; // Import the Clock widget
@@ -19,6 +20,9 @@ void main() async {
     await windowManager.focus();
   });
 
+  // Initialize date formatting for Chinese locale
+  await initializeDateFormatting('zh_CN', null);
+
   // Initialize tables
   addTables(30); // Add 10 tables for example
 
@@ -29,7 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '金财神餐饮收银系统',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

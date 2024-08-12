@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'menu_service.dart';
+import 'clock.dart';
 
 class OrderingPage extends StatefulWidget {
   final String tableNumber;
@@ -132,7 +133,7 @@ class _OrderingPageState extends State<OrderingPage> {
       length: menu.length,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Menu - Table ${widget.tableNumber}'),
+          title: Text('点餐 - 桌台 ${widget.tableNumber}'),
           bottom: TabBar(
             isScrollable: true,
             tabs: menu.map((category) {
@@ -194,7 +195,7 @@ class _OrderingPageState extends State<OrderingPage> {
                                         ),
                                       ),
                                       Text(
-                                        '\$${dish['price']}',
+                                        '¥${dish['price']}',
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 16.0,
@@ -229,7 +230,10 @@ class _OrderingPageState extends State<OrderingPage> {
               flex: 1,
               child: Column(
                 children: [
-                  Text('Table Status: $tableStatus'),
+                  // Text('Table Status: $tableStatus'),
+                  // Text('金钥匙烤鸭店\n桌台 ${widget.tableNumber}\n时间：${Clock()}'),
+                  Text('金钥匙烤鸭店\n桌台 ${widget.tableNumber}\n'
+                      '${Clock().getCurrentDateTimeInChineseStyle()}'),
 
                   Expanded(
                     child: ListView(
@@ -241,7 +245,7 @@ class _OrderingPageState extends State<OrderingPage> {
                             .firstWhere((dish) => dish['name'] == dishName);
                         return ListTile(
                           title: Text('$dishName x $quantity'),
-                          subtitle: Text('\$${dish['price'] * quantity}'),
+                          subtitle: Text('¥${dish['price'] * quantity}'),
                         );
                       }).toList(),
                     ),
@@ -252,9 +256,8 @@ class _OrderingPageState extends State<OrderingPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Text('Total Dishes: ${_getTotalDishes()}'),
-                        Text(
-                            'Total Amount: \$${_getTotalAmount().toStringAsFixed(2)}'),
+                        Text('菜品小计: ${_getTotalDishes()}'),
+                        Text('金额小计: ¥${_getTotalAmount().toStringAsFixed(2)}'),
                       ],
                     ),
                   ),

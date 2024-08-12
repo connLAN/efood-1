@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
 class Clock extends StatefulWidget {
   @override
   _ClockState createState() => _ClockState();
+
+  String getCurrentDateTimeInChineseStyle() {
+    final DateTime now = DateTime.now();
+    return DateFormat('yyyy年MM月dd日 HH:mm:ss', 'zh_CN').format(now);
+  }
 }
 
 class _ClockState extends State<Clock> {
@@ -14,10 +18,8 @@ class _ClockState extends State<Clock> {
   @override
   void initState() {
     super.initState();
-    initializeDateFormatting().then((_) {
-      _timeString = _formatDateTime(DateTime.now());
-      Timer.periodic(Duration(seconds: 1), (Timer t) => _updateTime());
-    });
+    _timeString = _formatDateTime(DateTime.now());
+    Timer.periodic(Duration(seconds: 1), (Timer t) => _updateTime());
   }
 
   void _updateTime() {
