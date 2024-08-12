@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 import 'menu_service.dart';
 
 class OrderingPage extends StatefulWidget {
+  final String tableNumber;
+
+  OrderingPage({required this.tableNumber});
+
   @override
   _OrderingPageState createState() => _OrderingPageState();
 }
 
 class _OrderingPageState extends State<OrderingPage> {
-  // 已选菜品及其数量
   Map<String, int> selectedDishesQuantities = {};
-
-  // 菜单数据
   List<Map<String, dynamic>> menu = [];
-
-  // Set to keep track of selected dishes
   Set<String> selectedDishes = {};
 
   @override
   void initState() {
     super.initState();
     loadMenu();
+    loadOrders();
   }
 
   Future<void> loadMenu() async {
@@ -27,7 +29,6 @@ class _OrderingPageState extends State<OrderingPage> {
       final data = await MenuService.loadMenu();
       setState(() {
         menu = List<Map<String, dynamic>>.from(data);
-        // Add "All" category
         menu.insert(0, {
           'category': 'All',
           'dishes': menu.expand((category) => category['dishes']).toList(),
@@ -38,6 +39,23 @@ class _OrderingPageState extends State<OrderingPage> {
     }
   }
 
+  Future<void> loadOrders() async {
+    final prefs = await SharedPreferences.getInstance();
+    final orders = prefs.getString('orders_${widget.tableNumber}');
+    if (orders != null) {
+      setState(() {
+        selectedDishesQuantities = Map<String, int>.from(json.decode(orders));
+        selectedDishes = selectedDishesQuantities.keys.toSet();
+      });
+    }
+  }
+
+  Future<void> saveOrders() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+        'orders_${widget.tableNumber}', json.encode(selectedDishesQuantities));
+  }
+
   void _toggleSelection(String dishName) {
     setState(() {
       if (selectedDishes.contains(dishName)) {
@@ -46,6 +64,7 @@ class _OrderingPageState extends State<OrderingPage> {
         selectedDishes.add(dishName);
         _increment(dishName);
       }
+      saveOrders();
     });
   }
 
@@ -53,6 +72,7 @@ class _OrderingPageState extends State<OrderingPage> {
     setState(() {
       selectedDishesQuantities[dishName] =
           (selectedDishesQuantities[dishName] ?? 0) + 1;
+      saveOrders();
     });
   }
 
@@ -65,6 +85,7 @@ class _OrderingPageState extends State<OrderingPage> {
         if (selectedDishesQuantities[dishName] == 0) {
           selectedDishes.remove(dishName);
         }
+        saveOrders();
       }
     });
   }
@@ -109,10 +130,10 @@ class _OrderingPageState extends State<OrderingPage> {
                   return GridView.builder(
                     padding: EdgeInsets.all(8.0),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 8, // Number of buttons per row
+                      crossAxisCount: 8,
                       crossAxisSpacing: 8.0,
                       mainAxisSpacing: 8.0,
-                      childAspectRatio: 1.0, // Make the buttons square
+                      childAspectRatio: 1.0,
                     ),
                     itemCount: dishes.length,
                     itemBuilder: (context, index) {
@@ -149,14 +170,14 @@ class _OrderingPageState extends State<OrderingPage> {
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black,
-                                          fontSize: 16.0, // Bigger font size
+                                          fontSize: 16.0,
                                         ),
                                       ),
                                       Text(
                                         '\$${dish['price']}',
                                         style: TextStyle(
                                           color: Colors.black,
-                                          fontSize: 16.0, // Bigger font size
+                                          fontSize: 16.0,
                                         ),
                                       ),
                                     ],
@@ -169,10 +190,8 @@ class _OrderingPageState extends State<OrderingPage> {
                                     '${quantity.toString()}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors
-                                          .red, // Red color for the number
-                                      fontSize:
-                                          24.0, // Bigger font size for the number
+                                      color: Colors.red,
+                                      fontSize: 24.0,
                                     ),
                                   ),
                                 ),

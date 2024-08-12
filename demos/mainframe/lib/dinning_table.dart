@@ -136,9 +136,9 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => OrderingPage(
-                      // tableNumber: table.tableNumber, // Correct parameter name
-                      // onOrderPlaced: table.orderPlaced ?? () {},
-                      ),
+                    tableNumber: table.tableNumber, // Correct parameter name
+                    // onOrderPlaced: table.orderPlaced ?? () {},
+                  ),
                 ),
               ).then((_) {
                 setState(() {
