@@ -66,7 +66,8 @@ class _OrderingPageState extends State<OrderingPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
         'orders_${widget.tableNumber}', json.encode(selectedDishesQuantities));
-    await prefs.setString('table_status_${widget.tableNumber}', tableStatus);
+    await prefs.setString(
+        'table_status_${widget.tableNumber}', tableStatus);
   }
 
   void _toggleSelection(String dishName) {
@@ -75,9 +76,8 @@ class _OrderingPageState extends State<OrderingPage> {
         selectedDishes.remove(dishName);
       } else {
         selectedDishes.add(dishName);
-        _increment(dishName);
       }
-      saveOrders();
+      _increment(dishName);
     });
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ordering_page.dart'; // Import the OrderingPage
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Table {
   final String tableNumber;
@@ -85,6 +86,14 @@ class DinningTablesPage extends StatefulWidget {
 }
 
 class _DinningTablesPageState extends State<DinningTablesPage> {
+  Future<void> clearAllOrders() async {
+    final prefs = await SharedPreferences.getInstance();
+    for (var table in tableList.tables) {
+      await prefs.remove('orders_${table.tableNumber}');
+      await prefs.remove('table_status_${table.tableNumber}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -93,6 +102,19 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dining Tables'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () async {
+              await clearAllOrders();
+              setState(() {
+                for (var table in tableList.tables) {
+                  table.tableStatus = 'Available';
+                }
+              });
+            },
+          ),
+        ],
       ),
       body: GridView.builder(
         padding: EdgeInsets.all(16),
