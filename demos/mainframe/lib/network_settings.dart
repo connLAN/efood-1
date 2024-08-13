@@ -11,7 +11,7 @@ class NetworkSettingsPage extends StatelessWidget {
         title: Text('Network Settings'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.help),
+            icon: Icon(Icons.network_check),
             onPressed: () {
               handleHelpAction(context);
             },
@@ -20,7 +20,7 @@ class NetworkSettingsPage extends StatelessWidget {
       ),
       body: Center(
         child: Text(
-            'This is the network settings page. Configure your network settings here.'),
+            '配置以及显示网络信息.'),
       ),
     );
   }
@@ -31,7 +31,7 @@ class NetworkLogPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Network Log'),
+        title: Text('网络日志'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.help),
@@ -43,7 +43,7 @@ class NetworkLogPage extends StatelessWidget {
       ),
       body: Center(
         child:
-            Text('This is the network log page. View your network logs here.'),
+            Text('显示网络日志，建设中 ...'),
       ),
     );
   }
@@ -76,7 +76,7 @@ class NetworkPage extends StatelessWidget {
                       builder: (context) => NetworkSettingsPage()),
                 );
               },
-              child: Text('Go to Network Settings'),
+              child: Text('转到网络设置页面'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -85,7 +85,7 @@ class NetworkPage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => NetworkLogPage()),
                 );
               },
-              child: Text('Go to Network Log'),
+              child: Text('跳转到网络日志页面'),
             ),
           ],
         ),

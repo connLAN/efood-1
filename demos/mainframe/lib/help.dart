@@ -15,10 +15,10 @@ class HelpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Help'),
+        title: Text('帮助'),
       ),
       body: Center(
-        child: Text('This is the help page. Here you can find help content.'),
+        child: Text('帮助页面， 建设中 ...'),
       ),
     );
   }

@@ -7,6 +7,21 @@ import 'settings.dart'; // Import the CommonSettingsPage
 import 'clock.dart'; // Import the Clock widget
 
 class IconsPage extends StatelessWidget {
+  void onPressed(BuildContext context) {
+    // Define your onPressed logic here
+    print('Button pressed');
+  }
+
+  void handlePersonOutlinePressed(BuildContext context) {
+    // Define your handlePersonOutlinePressed logic here
+    print('Person outline button pressed');
+  }
+
+  void handleDinningTablePressed(BuildContext context) {
+    // Define your handleDinningTablePressed logic here
+    print('Dinning table button pressed');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,8 +71,8 @@ class IconsPage extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => CommonSettingsPage(
-                          shopName: 'My Shop',
-                          bannerImage: 'https://example.com/shop_banner.jpg',
+                          shopName: '招财猫3',
+                          bannerImage: 'assets/3.jpg',
                         )),
               );
             },
@@ -104,22 +119,21 @@ class IconsPage extends StatelessWidget {
               ),
           buttonSize),
       _createIconItem(
-          Image.asset('assets/dinning-table.jpg',
-              width: buttonSize * 0.4, height: buttonSize * 0.4),
+          Image(image: AssetImage('assets/dinning-table.jpg'), width: buttonSize * 0.4, height: buttonSize * 0.4),
           '桌台',
           Color.fromARGB(255, 197, 140, 179),
           () => handleDinningTablePressed(context),
           () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CommonSettingsPage(
-                          shopName: 'My Shop',
-                          bannerImage: 'https://example.com/shop_banner.jpg',
+                MaterialPageRoute(
+                    builder: (context) => CommonSettingsPage(
+                          shopName: '招财猫2',
+                          bannerImage: 'assets/2.jpg',
                         )),
               ),
           buttonSize),
       _createIconItem(
-          Image.asset('assets/crown.jpg',
-              width: buttonSize * 0.4, height: buttonSize * 0.4),
+          Image(image: AssetImage('assets/crown.jpg'), width: buttonSize * 0.4, height: buttonSize * 0.4),
           'V.I.P',
           Color.fromARGB(255, 222, 233, 6),
           () => handlePersonOutlinePressed(context),
@@ -155,9 +169,10 @@ class IconsPage extends StatelessWidget {
           () => onPressed(context),
           () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CommonSettingsPage(
-                          shopName: 'My Shop',
-                          bannerImage: 'https://example.com/shop_banner.jpg',
+                MaterialPageRoute(
+                    builder: (context) => CommonSettingsPage(
+                          shopName: '招财猫1',
+                          bannerImage: 'assets/1.jpg',
                         )),
               ),
           buttonSize),

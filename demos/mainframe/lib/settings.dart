@@ -18,7 +18,7 @@ class CommonSettingsPage extends StatelessWidget {
       ),
       body: Column(
         children: <Widget>[
-          Image.network(bannerImage),
+          Image.asset(bannerImage),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
@@ -39,8 +39,8 @@ void onSettingsIconClicked(BuildContext context) {
     context,
     MaterialPageRoute(
       builder: (context) => CommonSettingsPage(
-        shopName: 'My Shop',
-        bannerImage: 'https://example.com/shop_banner.jpg',
+        shopName: '招财猫餐饮收银系统',
+        bannerImage: 'assets/1.jpg',
       ),
     ),
   );
