@@ -83,13 +83,25 @@ class IconsPage extends StatelessWidget {
 
   List<Widget> _generateIconItems(BuildContext context, double buttonSize) {
     return [
-      _createIconItem(Icon(Icons.people, size: buttonSize * 0.4), 'People',
-          Colors.lightBlueAccent, () => onPressed(context), buttonSize),
       _createIconItem(
-          Icon(Icons.person_outline, size: buttonSize * 0.4),
-          'Person Outline',
+          Icon(Icons.restaurant, size: buttonSize * 0.4),
+          'restaurant',
+          Colors.lightBlueAccent,
+          () => onPressed(context),
+          () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PrintSettingsPage()),
+              ),
+          buttonSize),
+      _createIconItem(
+          Icon(Icons.local_dining, size: buttonSize * 0.4),
+          'local_dining',
           Colors.lightGreenAccent,
           () => handlePersonOutlinePressed(context),
+          () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
+              ),
           buttonSize),
       _createIconItem(
           Image.asset('assets/dinning-table.jpg',
@@ -97,6 +109,13 @@ class IconsPage extends StatelessWidget {
           '桌台',
           Color.fromARGB(255, 197, 140, 179),
           () => handleDinningTablePressed(context),
+          () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CommonSettingsPage(
+                          shopName: 'My Shop',
+                          bannerImage: 'https://example.com/shop_banner.jpg',
+                        )),
+              ),
           buttonSize),
       _createIconItem(
           Image.asset('assets/crown.jpg',
@@ -104,30 +123,62 @@ class IconsPage extends StatelessWidget {
           'V.I.P',
           Color.fromARGB(255, 222, 233, 6),
           () => handlePersonOutlinePressed(context),
+          () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HelpPage()),
+              ),
           buttonSize),
-      _createIconItem(Icon(Icons.thumb_up, size: buttonSize * 0.4), 'Thumb Up',
-          Colors.cyanAccent, () => onPressed(context), buttonSize),
+      _createIconItem(
+          Icon(Icons.thumb_up, size: buttonSize * 0.4),
+          'Thumb Up',
+          Colors.cyanAccent,
+          () => onPressed(context),
+          () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PrintSettingsPage()),
+              ),
+          buttonSize),
       _createIconItem(
           Icon(Icons.thumb_down, size: buttonSize * 0.4),
           'Thumb Down',
           Colors.purpleAccent,
           () => onPressed(context),
+          () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
+              ),
           buttonSize),
-      _createIconItem(Icon(Icons.favorite, size: buttonSize * 0.4), 'Favorite',
-          Colors.orangeAccent, () => onPressed(context), buttonSize),
+      _createIconItem(
+          Icon(Icons.favorite, size: buttonSize * 0.4),
+          'Favorite',
+          Colors.orangeAccent,
+          () => onPressed(context),
+          () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CommonSettingsPage(
+                          shopName: 'My Shop',
+                          bannerImage: 'https://example.com/shop_banner.jpg',
+                        )),
+              ),
+          buttonSize),
       _createIconItem(
           Icon(Icons.favorite_border, size: buttonSize * 0.4),
           'Favorite Border',
           Colors.redAccent,
           () => onPressed(context),
+          () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HelpPage()),
+              ),
           buttonSize),
     ];
   }
 
   Widget _createIconItem(Widget icon, String label, Color color,
-      VoidCallback onPressed, double buttonSize) {
+      VoidCallback onPressed, VoidCallback onRightClick, double buttonSize) {
     return GestureDetector(
       onTap: onPressed,
+      onSecondaryTap: onRightClick,
       child: Column(
         mainAxisSize: MainAxisSize.min, // Ensure the column takes minimum space
         children: [
