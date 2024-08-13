@@ -132,9 +132,10 @@ class _IconsPageState extends State<IconsPage> {
               mainAxisSpacing: 10.0, // 10 pixels margin between buttons
               padding: EdgeInsets.all(10.0), // Padding around the grid
               shrinkWrap: true, // Added to make GridView shrink to fit content
-              physics: NeverScrollableScrollPhysics(), // Disable GridView scrolling
-              children: _generateIconItems(
-                  context, buttonSize), // Provide the correct number of arguments
+              physics:
+                  NeverScrollableScrollPhysics(), // Disable GridView scrolling
+              children: _generateIconItems(context,
+                  buttonSize), // Provide the correct number of arguments
             );
           },
         ),
@@ -174,7 +175,8 @@ class _IconsPageState extends State<IconsPage> {
           () => handleDinningTablePressed(context),
           () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DinningTableSettingsPage()),
+                MaterialPageRoute(
+                    builder: (context) => DinningTableSettingsPage()),
               ),
           buttonSize),
       _createIconItem(
@@ -211,8 +213,8 @@ class _IconsPageState extends State<IconsPage> {
               ),
           buttonSize),
       _createIconItem(
-          Icon(Icons.favorite, size: buttonSize * 0.4),
-          'Favorite',
+          Icon(Icons.trending_up, size: buttonSize * 0.4),
+          '报表',
           Colors.orangeAccent,
           () => onPressed(context),
           () => Navigator.push(
@@ -221,9 +223,9 @@ class _IconsPageState extends State<IconsPage> {
               ),
           buttonSize),
       _createIconItem(
-          Icon(Icons.favorite_border, size: buttonSize * 0.4),
-          'Favorite Border',
-          const Color.fromARGB(255, 64, 106, 169),
+          Icon(Icons.receipt, size: buttonSize * 0.4),
+          '订单',
+          const Color.fromARGB(255, 246, 199, 248),
           () => onPressed(context),
           () => Navigator.push(
                 context,
