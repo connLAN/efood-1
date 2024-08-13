@@ -11,10 +11,12 @@ void main() async {
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = WindowOptions(
-    title: '招财猫餐饮收银系统',
+    title: 'ZCM',
     size: Size(1024, 768),
     minimumSize: Size(800, 600),
+    titleBarStyle: TitleBarStyle.normal,
   );
+
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
     await windowManager.focus();
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '招财猫餐饮收银系统',
+      title: '招财猫餐饮收银系统00',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
