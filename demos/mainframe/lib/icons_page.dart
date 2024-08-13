@@ -121,19 +121,23 @@ class _IconsPageState extends State<IconsPage> {
           ),
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          double buttonSize = (constraints.maxWidth - 70) /
-              6; // Calculate button size based on window width
-          return GridView.count(
-            crossAxisCount: 6, // 6 icons per line
-            crossAxisSpacing: 10.0, // 10 pixels margin between buttons
-            mainAxisSpacing: 10.0, // 10 pixels margin between buttons
-            padding: EdgeInsets.all(10.0), // Padding around the grid
-            children: _generateIconItems(
-                context, buttonSize), // Provide the correct number of arguments
-          );
-        },
+      body: SingleChildScrollView(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            double buttonSize = (constraints.maxWidth - 70) /
+                6; // Calculate button size based on window width
+            return GridView.count(
+              crossAxisCount: 6, // 6 icons per line
+              crossAxisSpacing: 10.0, // 10 pixels margin between buttons
+              mainAxisSpacing: 10.0, // 10 pixels margin between buttons
+              padding: EdgeInsets.all(10.0), // Padding around the grid
+              shrinkWrap: true, // Added to make GridView shrink to fit content
+              physics: NeverScrollableScrollPhysics(), // Disable GridView scrolling
+              children: _generateIconItems(
+                  context, buttonSize), // Provide the correct number of arguments
+            );
+          },
+        ),
       ),
     );
   }
