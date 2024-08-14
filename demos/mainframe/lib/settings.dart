@@ -16,18 +16,19 @@ class CommonSettingsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Settings'),
       ),
-      body: Column(
-        children: <Widget>[
-          Image.asset(bannerImage),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              shopName,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Image.asset(bannerImage),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                shopName,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          // Add more settings options here
-        ],
+          ],
+        ),
       ),
     );
   }

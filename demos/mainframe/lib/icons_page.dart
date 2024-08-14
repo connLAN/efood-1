@@ -8,6 +8,9 @@ import 'network_settings.dart'; // Import the NetworkSettingsPage
 import 'settings.dart'; // Import the CommonSettingsPage
 import 'dinning_table_settings.dart'; // Import the DiningTableSettingsPage
 import 'clock.dart'; // Import the Clock widget
+import 'emplyee_page.dart';
+import 'emplyee_settings.dart';
+import 'dishes_settings.dart';
 
 /////////////////////
 
@@ -156,13 +159,13 @@ class _IconsPageState extends State<IconsPage> {
               ),
           buttonSize),
       _createIconItem(
-          Icon(Icons.local_dining, size: buttonSize * 0.4),
-          'local_dining',
+          Icon(Icons.people, size: buttonSize * 0.4),
+          '员工',
           Colors.lightGreenAccent,
-          () => handlePersonOutlinePressed(context),
+          () => handleEmployeePressed(context),
           () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
+                MaterialPageRoute(builder: (context) => EmployeeSettingsPage()),
               ),
           buttonSize),
       _createIconItem(
@@ -184,7 +187,7 @@ class _IconsPageState extends State<IconsPage> {
               image: AssetImage('assets/crown.jpg'),
               width: buttonSize * 0.4,
               height: buttonSize * 0.4),
-          'V.I.P',
+          'V.I.P 会员',
           Color.fromARGB(255, 222, 233, 6),
           () => handlePersonOutlinePressed(context),
           () => Navigator.push(
@@ -193,13 +196,16 @@ class _IconsPageState extends State<IconsPage> {
               ),
           buttonSize),
       _createIconItem(
-          Icon(Icons.thumb_up, size: buttonSize * 0.4),
-          'Thumb Up',
+          Image(
+              image: AssetImage('assets/dishes2.png'),
+              width: buttonSize * 0.4,
+              height: buttonSize * 0.4),
+          '菜品管理',
           Colors.cyanAccent,
           () => onPressed(context),
           () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => PrintSettingsPage()),
+                MaterialPageRoute(builder: (context) => DishesSettingsPage()),
               ),
           buttonSize),
       _createIconItem(
