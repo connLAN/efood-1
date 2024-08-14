@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'dart:convert';
 
 void main() {
   runApp(FileMixerApp());
@@ -22,38 +22,81 @@ class FileMixerHomePage extends StatefulWidget {
 }
 
 class _FileMixerHomePageState extends State<FileMixerHomePage> {
-  String? _filePath;
   String? _statusMessage;
+  String? _defaultDir;
+  String? _selectedPath;
 
-  Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+  @override
+  void initState() {
+    super.initState();
+    _setDefaultDir();
+  }
+
+  Future<void> _setDefaultDir() async {
+    final directory = await getApplicationDocumentsDirectory();
+    setState(() {
+      _defaultDir = directory.path;
+    });
+  }
+
+  Future<void> _selectFileOrDir() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.any,
+      allowCompression: false,
+      withData: false,
+      withReadStream: false,
+    );
+
     if (result != null) {
       setState(() {
-        _filePath = result.files.single.path;
-        _statusMessage = 'File selected: ${result.files.single.name}';
+        _selectedPath = result.files.single.path;
       });
     }
   }
 
-  Future<void> _mixFile() async {
-    if (_filePath == null) return;
-    File file = File(_filePath!);
-    List<int> bytes = await file.readAsBytes();
-    List<int> mixedBytes = bytes.map((byte) => byte ^ 0xFF).toList();
-    await file.writeAsBytes(mixedBytes);
+  Future<void> _processSubdirectory() async {
+    if (_selectedPath == null) return;
+
+    final subDir = Directory(_selectedPath!);
+    if (!await subDir.exists()) {
+      setState(() {
+        _statusMessage = 'Selected path does not exist';
+      });
+      return;
+    }
+
+    final files = subDir.listSync();
+    for (var file in files) {
+      if (file is File) {
+        List<int> bytes = await file.readAsBytes();
+        List<int> mixedBytes = bytes.map((byte) => byte ^ 0xFF).toList();
+        await file.writeAsBytes(mixedBytes);
+      }
+    }
+
     setState(() {
-      _statusMessage = 'File mixed successfully';
+      _statusMessage = 'Processed ${files.length} files in subdir';
     });
   }
 
-  Future<void> _remixFile() async {
-    if (_filePath == null) return;
-    File file = File(_filePath!);
+  Future<void> _mixOrRemixFile() async {
+    if (_selectedPath == null) return;
+
+    final file = File(_selectedPath!);
+    if (!await file.exists()) {
+      setState(() {
+        _statusMessage = 'Selected file does not exist';
+      });
+      return;
+    }
+
     List<int> bytes = await file.readAsBytes();
-    List<int> remixedBytes = bytes.map((byte) => byte ^ 0xFF).toList();
-    await file.writeAsBytes(remixedBytes);
+    List<int> mixedBytes = bytes.map((byte) => byte ^ 0xFF).toList();
+    await file.writeAsBytes(mixedBytes);
+
     setState(() {
-      _statusMessage = 'File re-mixed successfully';
+      _statusMessage = 'File processed successfully';
     });
   }
 
@@ -63,22 +106,36 @@ class _FileMixerHomePageState extends State<FileMixerHomePage> {
       appBar: AppBar(
         title: Text('File Mixer'),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            Text('Default Directory:'),
+            SizedBox(height: 8),
+            Text(_defaultDir ?? 'Loading...'),
+            SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _pickFile,
-              child: Text('Pick File'),
+              onPressed: _selectFileOrDir,
+              child: Text('Select File or Directory'),
             ),
-            ElevatedButton(
-              onPressed: _mixFile,
-              child: Text('Mix File'),
+            SizedBox(height: 8),
+            Text(_selectedPath ?? 'No file or directory selected'),
+            Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: _mixOrRemixFile,
+                  child: Text('Mix/Re-mix File'),
+                ),
+                ElevatedButton(
+                  onPressed: _processSubdirectory,
+                  child: Text('Process Subdirectory'),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: _remixFile,
-              child: Text('Re-mix File'),
-            ),
+            SizedBox(height: 16),
             if (_statusMessage != null) Text(_statusMessage!),
           ],
         ),
