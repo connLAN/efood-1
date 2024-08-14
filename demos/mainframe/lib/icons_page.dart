@@ -112,14 +112,15 @@ class _IconsPageState extends State<IconsPage> {
             icon: Icon(Icons.settings),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => CommonSettingsPage(
-                          shopName: '招财猫3',
-                          bannerImage: 'assets/3.jpg',
-                        )),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //       builder: (context) => CommonSettingsPage(
+              //             shopName: '招财猫3',
+              //             bannerImage: 'assets/3.jpg',
+              //           )),
+              // );
+              onSettingsIconClicked(context);
             },
           ),
         ],

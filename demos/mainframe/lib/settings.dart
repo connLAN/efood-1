@@ -14,7 +14,7 @@ class CommonSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text('配置页面'),
       ),
       body: SingleChildScrollView(
         child: Column(
