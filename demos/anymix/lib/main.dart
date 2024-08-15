@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(FileMixerApp());
@@ -29,7 +30,19 @@ class _FileMixerHomePageState extends State<FileMixerHomePage> {
   @override
   void initState() {
     super.initState();
+    _requestPermissions();
     _setDefaultDir();
+  }
+
+  Future<void> _requestPermissions() async {
+    if (await Permission.storage.request().isGranted) {
+      // Permission granted, proceed with file operations
+    } else {
+      // Handle the case where the user denies the permission
+      setState(() {
+        _statusMessage = 'Storage permission denied';
+      });
+    }
   }
 
   Future<void> _setDefaultDir() async {
@@ -40,17 +53,23 @@ class _FileMixerHomePageState extends State<FileMixerHomePage> {
   }
 
   Future<void> _selectFileOrDir() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      type: FileType.any,
-      allowCompression: false,
-      withData: false,
-      withReadStream: false,
-    );
+    if (await Permission.storage.request().isGranted) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        type: FileType.any,
+        allowCompression: false,
+        withData: false,
+        withReadStream: false,
+      );
 
-    if (result != null) {
+      if (result != null) {
+        setState(() {
+          _selectedPath = result.files.single.path;
+        });
+      }
+    } else {
       setState(() {
-        _selectedPath = result.files.single.path;
+        _statusMessage = 'Storage permission denied';
       });
     }
   }
