@@ -18,10 +18,10 @@
 
 
 
-$body3 = @{
-    category_id = "CAT123"
-} | ConvertTo-Json
+# $body3 = @{
+#     category_id = "CAT123"
+# } | ConvertTo-Json
 
-Invoke-WebRequest -Uri "http://localhost:3000/table_category" -Method Delete -Body $body3 -ContentType "application/json"
+# Invoke-WebRequest -Uri "http://localhost:3000/table_category" -Method Delete -Body $body3 -ContentType "application/json"
 
-
+   Invoke-WebRequest -Uri "http://localhost:3000/table_category_all" -Method Get
