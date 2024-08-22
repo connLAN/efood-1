@@ -17,6 +17,17 @@ db.connect((err) => {
     console.log('MySQL Connected...');
 });
 
+// Middleware to log request information
+router.use((req, res, next) => {
+    console.log(`Request Method: ${req.method}`);
+    console.log(`Request URL: ${req.url}`);
+    console.log(`Request Headers: ${JSON.stringify(req.headers)}`);
+    if (req.method === 'POST' || req.method === 'PUT') {
+        console.log(`Request Body: ${JSON.stringify(req.body)}`);
+    }
+    next();
+});
+
 // Get a category
 router.get('/table_category/:id', (req, res) => {
     let sql = `SELECT * FROM table_categories WHERE id = ${req.params.id}`;
@@ -25,6 +36,8 @@ router.get('/table_category/:id', (req, res) => {
             return res.status(500).send(err);
         }
         res.json(results);
+
+        console.log('res:', res);
     });
 });
 
@@ -42,4 +55,3 @@ router.get('/table_category_all', (req, res) => {
 });
 
 module.exports = router;
-

@@ -2,15 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'utils.dart'; // Import utility functions
 import 'help.dart'; // Import the HelpPage
-import 'print_settings.dart'; // Import the PrintSettingsPage
-import 'store_settings.dart'; // Import the PrintSettingsPage
-import 'network_settings.dart'; // Import the NetworkSettingsPage
-import 'settings.dart'; // Import the CommonSettingsPage
-import 'dinning_table_settings.dart'; // Import the DiningTableSettingsPage
 import 'clock.dart'; // Import the Clock widget
 import 'emplyee_page.dart';
 import 'emplyee_settings.dart';
 import 'dishes_settings.dart';
+import 'dinning_table_settings.dart'; // Import the DiningTableSettingsPage
+import 'print_settings.dart'; // Import the PrintSettingsPage
+import 'store_settings.dart'; // Import the PrintSettingsPage
+import 'network_settings.dart'; // Import the NetworkSettingsPage
+import 'settings.dart'; // Import the CommonSettingsPage
 
 /////////////////////
 
@@ -179,8 +179,7 @@ class _IconsPageState extends State<IconsPage> {
           () => handleDinningTablePressed(context),
           () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => DinningTableSettingsPage()),
+                MaterialPageRoute(builder: (context) => DinningTableSettings()),
               ),
           buttonSize),
       _createIconItem(
