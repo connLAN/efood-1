@@ -9,19 +9,19 @@ class DinningTableSettings extends StatefulWidget {
 
 class _DinningTableSettingsState extends State<DinningTableSettings> {
   List<TableCategory> _tableCategories = [];
+  List<Table> _tables = [];
 
   @override
   void initState() {
     super.initState();
     _fetchTableCategories();
+    _fetchTables();
   }
 
   Future<void> _fetchTableCategories() async {
     final response = await http.get(Uri.parse('http://localhost:3000/table_category_all'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      print(data);
-
       setState(() {
         _tableCategories = data.map((item) => TableCategory.fromJson(item)).toList();
       });
@@ -30,20 +30,15 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     }
   }
 
-  Future<void> _updateCategoryStatus(String categoryId, int isActive) async {
-    final response = await http.put(
-      Uri.parse('http://localhost:3000/update_category_status'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'category_id': categoryId,
-        'is_active': isActive,
-      }),
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update category status');
+  Future<void> _fetchTables() async {
+    final response = await http.get(Uri.parse('http://localhost:3000/tables_all'));
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      setState(() {
+        _tables = data.map((item) => Table.fromJson(item)).toList();
+      });
+    } else {
+      throw Exception('Failed to load tables');
     }
   }
 
@@ -58,40 +53,127 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     });
   }
 
+  void _showAddTableDialog() {
+    final _formKey = GlobalKey<FormState>();
+    String _tableName = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add New Table'),
+          content: Form(
+            key: _formKey,
+            child: TextFormField(
+              decoration: InputDecoration(labelText: 'Table Name'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a table name';
+                }
+                return null;
+              },
+              onSaved: (value) {
+                _tableName = value!;
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Add'),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  _addTable(_tableName);
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _addTable(String tableName) async {
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/add_table'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'table_name': tableName,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      _fetchTables();
+    } else {
+      throw Exception('Failed to add table');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dinning Table Settings'),
       ),
-      body: _tableCategories.isNotEmpty
-          ? ListView.builder(
-              itemCount: _tableCategories.length + 1,
-              itemBuilder: (context, index) {
-                if (index == _tableCategories.length) {
-                  return ListTile(
-                    leading: Icon(Icons.add),
-                    title: Text('Add New Category'),
-                    onTap: _addNewCategory,
-                  );
-                }
-                final category = _tableCategories[index];
-                return ListTile(
-                  leading: Checkbox(
-                    value: category.is_active == 1,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        category.is_active = value! ? 1 : 0;
-                        _updateCategoryStatus(category.category_id, category.is_active);
-                      });
+      body: Column(
+        children: [
+          Expanded(
+            child: _tableCategories.isNotEmpty
+                ? ListView.builder(
+                    itemCount: _tableCategories.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == _tableCategories.length) {
+                        return ListTile(
+                          leading: Icon(Icons.add),
+                          title: Text('Add New Category'),
+                          onTap: _addNewCategory,
+                        );
+                      }
+                      final category = _tableCategories[index];
+                      return ListTile(
+                        leading: Checkbox(
+                          value: category.is_active == 1,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              category.is_active = value! ? 1 : 0;
+                            });
+                          },
+                        ),
+                        title: Text(category.category_name),
+                      );
                     },
-                  ),
-                  title: Text(category.category_name),
-                  subtitle: Text('ID: ${category.category_id}'),
-                );
-              },
-            )
-          : Center(child: CircularProgressIndicator()),
+                  )
+                : Center(child: CircularProgressIndicator()),
+          ),
+          Divider(),
+          Expanded(
+            child: _tables.isNotEmpty
+                ? ListView.builder(
+                    itemCount: _tables.length,
+                    itemBuilder: (context, index) {
+                      final table = _tables[index];
+                      return ListTile(
+                        title: Text(table.name),
+                      );
+                    },
+                  )
+                : Center(child: CircularProgressIndicator()),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddTableDialog,
+        child: Icon(Icons.add),
+      ),
     );
   }
 }
@@ -115,6 +197,23 @@ class TableCategory {
       category_id: json['category_id'],
       category_name: json['category_name'],
       is_active: json['is_active'],
+    );
+  }
+}
+
+class Table {
+  final int id;
+  final String name;
+
+  Table({
+    required this.id,
+    required this.name,
+  });
+
+  factory Table.fromJson(Map<String, dynamic> json) {
+    return Table(
+      id: json['id'],
+      name: json['name'],
     );
   }
 }
