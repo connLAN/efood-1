@@ -54,4 +54,33 @@ router.get('/table_category_all', (req, res) => {
     });
 });
 
+// Update category status
+router.put('/update_category_status', (req, res) => {
+    const { category_id, is_active } = req.body;
+    let sql = `UPDATE table_categories SET is_active = ? WHERE category_id = ?`;
+    console.log(`Executing SQL: ${sql}`); // Log the SQL query
+    console.log(`Parameters: is_active = ${is_active}, category_id = ${category_id}`); // Log the parameters
+    db.query(sql, [is_active, category_id], (err, results) => {
+        if (err) {
+            console.error(`SQL Error: ${err.sqlMessage}`); // Log the SQL error
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
+});
+
+// Add a category
+router.post('/add_category', (req, res) => {
+    const { name, status } = req.body;
+    let sql = `INSERT INTO table_categories (category_name, category_id, is_active) VALUES (?, ?, ?)`;
+    console.log(`Executing SQL: ${sql}`); // Log the SQL query
+    db.query(sql, [name, status], (err, results) => {
+        if (err) {
+            console.error(`SQL Error: ${err.sqlMessage}`); // Log the SQL error
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
+});
+
 module.exports = router;
