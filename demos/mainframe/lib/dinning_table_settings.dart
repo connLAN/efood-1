@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:pinyin/pinyin.dart';
 
 class DinningTableSettings extends StatefulWidget {
   @override
@@ -79,7 +80,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('餐桌设置'),
+        title: Text('餐桌设置页面'),
       ),
       body: Row(
         children: [
@@ -91,8 +92,8 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                       if (index == _tableCategories.length) {
                         return ListTile(
                           leading: Icon(Icons.add),
-                          title: Text('新增餐桌类别'),
-                          onTap: _addNewCategory,
+                          title: Text('添加新类别'),
+                          onTap: _showAddCategoryDialog,
                         );
                       }
                       final category = _tableCategories[index];
@@ -140,7 +141,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                             Expanded(
                               child: TextField(
                                 controller: _nameControllers[table.id],
-                                decoration: InputDecoration(labelText: '名字'),
+                                decoration: InputDecoration(labelText: '桌名'),
                                 onSubmitted: (newValue) {
                                   setState(() {
                                     table.name = newValue;
@@ -153,8 +154,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                             Expanded(
                               child: TextField(
                                 controller: _elegantNameControllers[table.id],
-                                decoration:
-                                    InputDecoration(labelText: '雅称'),
+                                decoration: InputDecoration(labelText: '雅称'),
                                 onSubmitted: (newValue) {
                                   setState(() {
                                     table.elegant_name = newValue;
@@ -167,8 +167,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                             Expanded(
                               child: TextField(
                                 controller: _capacityControllers[table.id],
-                                decoration:
-                                    InputDecoration(labelText: '座位数量'),
+                                decoration: InputDecoration(labelText: '座位数'),
                                 keyboardType: TextInputType.number,
                                 onSubmitted: (newValue) {
                                   setState(() {
@@ -184,7 +183,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                       );
                     },
                   )
-                : Center(child: Text('请选择一个餐桌类别')),
+                : Center(child: Text('请选择一个类别')),
           ),
         ],
       ),
@@ -195,15 +194,75 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     );
   }
 
-  void _addNewCategory() {
-    setState(() {
-      _tableCategories.add(TableCategory(
-        id: _tableCategories.length + 1,
-        category_id: 'NEW',
-        category_name: 'New Category',
-        is_active: 1,
-      ));
-    });
+  void _showAddCategoryDialog() {
+    final _formKey = GlobalKey<FormState>();
+    String _categoryName = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('新增类别'),
+          content: Form(
+            key: _formKey,
+            child: TextFormField(
+              decoration: InputDecoration(labelText: '类别名称'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return '请输入类别名称';
+                }
+                return null;
+              },
+              onSaved: (value) {
+                _categoryName = value!;
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('确认增加'),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  _addCategory(_categoryName);
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _addCategory(String categoryName) async {
+    // generate category id from category name
+    String pinyinInitials =
+        PinyinHelper.getShortPinyin(categoryName).toUpperCase();
+
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/add_category'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'category_name': categoryName,
+        'category_id': pinyinInitials,
+        'is_active': 1,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      _fetchTableCategories();
+    } else {
+      throw Exception('Failed to add category');
+    }
   }
 
   void _showAddTableDialog() {
@@ -216,17 +275,17 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('新增餐桌'),
+          title: Text('Add New Table'),
           content: Form(
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
-                  decoration: InputDecoration(labelText: '餐桌名'),
+                  decoration: InputDecoration(labelText: 'Table Name'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return '请输入餐桌名';
+                      return 'Please enter a table name';
                     }
                     return null;
                   },
@@ -235,10 +294,10 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                   },
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: '雅称'),
+                  decoration: InputDecoration(labelText: 'Elegant Name'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return '请输入餐桌雅称';
+                      return 'Please enter an elegant name';
                     }
                     return null;
                   },
@@ -247,11 +306,11 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                   },
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: '座位数量'),
+                  decoration: InputDecoration(labelText: 'Capacity'),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return '请输入座位数量';
+                      return 'Please enter a capacity';
                     }
                     return null;
                   },
@@ -264,13 +323,13 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('取消'),
+              child: Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('新增'),
+              child: Text('Add'),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
