@@ -178,6 +178,28 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                                 },
                               ),
                             ),
+
+                            // expanded button
+                            // if no info changed, just add a delete btn
+                            // if info changed, add a check btn
+                            SizedBox(height: 10),
+                            Expanded(
+                              child: table.isChanged
+                                  ? IconButton(
+                                      icon: Icon(Icons.check),
+                                      onPressed: () {
+                                        // Handle check button press
+                                        print('Check button pressed');
+                                      },
+                                    )
+                                  : IconButton(
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () {
+                                        // Handle delete button press
+                                        print('Delete button pressed');
+                                      },
+                                    ),
+                            ),
                           ],
                         ),
                       );
@@ -261,7 +283,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     if (response.statusCode == 200) {
       _fetchTableCategories();
     } else {
-      throw Exception('Failed to add category');
+      throw Exception('添加类别失败');
     }
   }
 
@@ -275,17 +297,17 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add New Table'),
+          title: Text('新增餐桌'),
           content: Form(
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Table Name'),
+                  decoration: InputDecoration(labelText: '餐桌名'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a table name';
+                      return '请输入餐桌名称';
                     }
                     return null;
                   },
@@ -294,10 +316,10 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                   },
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Elegant Name'),
+                  decoration: InputDecoration(labelText: '雅称'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter an elegant name';
+                      return '请输入餐桌雅称/别名';
                     }
                     return null;
                   },
@@ -306,11 +328,11 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                   },
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Capacity'),
+                  decoration: InputDecoration(labelText: '座位数/人数'),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a capacity';
+                      return '请输入餐桌的座位数/人数';
                     }
                     return null;
                   },
@@ -378,7 +400,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update table name');
+      throw Exception('更新餐桌名称失败');
     }
   }
 
@@ -395,7 +417,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update table elegant name');
+      throw Exception('更新餐桌雅称失败');
     }
   }
 
@@ -412,7 +434,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update table capacity');
+      throw Exception('更新座位数失败');
     }
   }
 }
@@ -446,6 +468,7 @@ class Table {
   String elegant_name;
   int capacity;
   final String category_id;
+  bool isChanged; // Track whether the information has changed
 
   Table({
     required this.id,
@@ -453,6 +476,7 @@ class Table {
     required this.elegant_name,
     required this.capacity,
     required this.category_id,
+    this.isChanged = false, // Initialize to false
   });
 
   factory Table.fromJson(Map<String, dynamic> json) {
