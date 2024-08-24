@@ -71,10 +71,10 @@ router.put('/update_category_status', (req, res) => {
 
 // Add a category
 router.post('/add_category', (req, res) => {
-    const { name, status } = req.body;
+    const { category_name, category_id, is_active } = req.body;
     let sql = `INSERT INTO table_categories (category_name, category_id, is_active) VALUES (?, ?, ?)`;
     console.log(`Executing SQL: ${sql}`); // Log the SQL query
-    db.query(sql, [name, status], (err, results) => {
+    db.query(sql, [category_name, category_id, is_active], (err, results) => {
         if (err) {
             console.error(`SQL Error: ${err.sqlMessage}`); // Log the SQL error
             return res.status(500).send(err);
