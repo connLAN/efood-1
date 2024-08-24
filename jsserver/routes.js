@@ -28,6 +28,8 @@ router.use((req, res, next) => {
     next();
 });
 
+// Define your routes here
+
 // Get a category
 router.get('/table_category/:id', (req, res) => {
     let sql = `SELECT * FROM table_categories WHERE id = ${req.params.id}`;
@@ -36,8 +38,6 @@ router.get('/table_category/:id', (req, res) => {
             return res.status(500).send(err);
         }
         res.json(results);
-
-        console.log('res:', res);
     });
 });
 
@@ -83,11 +83,7 @@ router.post('/add_category', (req, res) => {
     });
 });
 
-
-
-
-
-// tables related functions
+// Tables related functions
 // Get all tables
 router.get('/tables_all', (req, res) => {
     let sql = `SELECT * FROM tables`;
@@ -100,7 +96,6 @@ router.get('/tables_all', (req, res) => {
         res.json(results);
     });
 });
-
 
 // Get a table
 router.get('/table/:id', (req, res) => {
@@ -115,11 +110,11 @@ router.get('/table/:id', (req, res) => {
 
 // Update table status
 router.put('/update_table_status', (req, res) => {
-    const { table_id, is_active } = req.body;
-    let sql = `UPDATE tables SET is_active = ? WHERE table_id = ?`;
+    const { id, is_active } = req.body;
+    let sql = `UPDATE tables SET is_active = ? WHERE id = ?`;
     console.log(`Executing SQL: ${sql}`); // Log the SQL query
-    console.log(`Parameters: is_active = ${is_active}, table_id = ${table_id}`); // Log the parameters
-    db.query(sql, [is_active, table_id], (err, results) => {
+    console.log(`Parameters: is_active = ${is_active}, id = ${id}`); // Log the parameters
+    db.query(sql, [is_active, id], (err, results) => {
         if (err) {
             console.error(`SQL Error: ${err.sqlMessage}`); // Log the SQL error
             return res.status(500).send(err);
@@ -128,11 +123,10 @@ router.put('/update_table_status', (req, res) => {
     });
 });
 
-
-// add a table
+// Add a table
 router.post('/add_table', (req, res) => {
     const { name, status } = req.body;
-    let sql = `INSERT INTO tables (table_name, table_id, is_active) VALUES (?, ?, ?)`;
+    let sql = `INSERT INTO tables (name, id, is_active) VALUES (?, ?, ?)`;
     console.log(`Executing SQL: ${sql}`); // Log the SQL query
     db.query(sql, [name, status], (err, results) => {
         if (err) {
@@ -143,9 +137,55 @@ router.post('/add_table', (req, res) => {
     });
 });
 
+// Update table name
+router.put('/update_table_name', (req, res) => {
+    const { id, name } = req.body;
+    let sql = `UPDATE tables SET name = ? WHERE id = ?`;
+    console.log(`Executing SQL: ${sql}`); // Log the SQL query
+    console.log(`Parameters: name = ${name}, id = ${id}`); // Log the parameters
+    db.query(sql, [name, id], (err, results) => {
+        if (err) {
+            console.error(`SQL Error: ${err.sqlMessage}`); // Log the SQL error
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
+});
 
+// Update table elegant_name
+router.put('/update_table_elegant_name', (req, res) => {
+    const { id, elegant_name } = req.body;
+    let sql = `UPDATE tables SET elegant_name = ? WHERE id = ?`;
+    console.log(`Executing SQL: ${sql}`); // Log the SQL query
+    console.log(`Parameters: elegant_name = ${elegant_name}, id = ${id}`); // Log the parameters
+    db.query(sql, [elegant_name, id], (err, results) => {
+        if (err) {
+            console.error(`SQL Error: ${err.sqlMessage}`); // Log the SQL error
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
+});
 
+// Update table capacity
+router.put('/update_table_capacity', (req, res) => {
+    const { id, capacity } = req.body;
+    let sql = `UPDATE tables SET capacity = ? WHERE id = ?`;
+    console.log(`Executing SQL: ${sql}`); // Log the SQL query
+    console.log(`Parameters: capacity = ${capacity}, id = ${id}`); // Log the parameters
+    db.query(sql, [capacity, id], (err, results) => {
+        if (err) {
+            console.error(`SQL Error: ${err.sqlMessage}`); // Log the SQL error
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
+});
 
-
+// Catch-all route for unmatched requests
+router.use((req, res) => {
+    console.log(`No route matched for ${req.method} ${req.url}`);
+    res.status(404).send({ error: 'Route not found' });
+});
 
 module.exports = router;

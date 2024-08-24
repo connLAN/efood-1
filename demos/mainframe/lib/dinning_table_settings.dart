@@ -143,6 +143,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                                 controller: _nameControllers[table.id],
                                 decoration: InputDecoration(labelText: '桌名'),
                                 onSubmitted: (newValue) {
+                                  print('Table name changed to $newValue');
                                   setState(() {
                                     table.name = newValue;
                                     _updateTableName(table.id, newValue);
@@ -156,6 +157,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                                 controller: _elegantNameControllers[table.id],
                                 decoration: InputDecoration(labelText: '雅称'),
                                 onSubmitted: (newValue) {
+                                  print('Elegant name changed to $newValue');
                                   setState(() {
                                     table.elegant_name = newValue;
                                     _updateTableElegantName(table.id, newValue);
@@ -345,13 +347,13 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: Text('取消'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Add'),
+              child: Text('确认添加'),
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
@@ -374,7 +376,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, dynamic>{
-        'table_name': tableName,
+        'name': tableName,
         'elegant_name': elegantName,
         'capacity': capacity,
       }),
@@ -383,19 +385,19 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     if (response.statusCode == 200) {
       _fetchTables();
     } else {
-      throw Exception('Failed to add table');
+      throw Exception('添加餐桌失败');
     }
   }
 
   Future<void> _updateTableName(int tableId, String newName) async {
-    final response = await http.post(
+    final response = await http.put(
       Uri.parse('http://localhost:3000/update_table_name'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, dynamic>{
-        'table_id': tableId,
-        'table_name': newName,
+        'id': tableId,
+        'name': newName,
       }),
     );
 
@@ -405,13 +407,13 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
   }
 
   Future<void> _updateTableElegantName(int tableId, String newName) async {
-    final response = await http.post(
+    final response = await http.put(
       Uri.parse('http://localhost:3000/update_table_elegant_name'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, dynamic>{
-        'table_id': tableId,
+        'id': tableId,
         'elegant_name': newName,
       }),
     );
@@ -422,13 +424,13 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
   }
 
   Future<void> _updateTableCapacity(int tableId, int newCapacity) async {
-    final response = await http.post(
+    final response = await http.put(
       Uri.parse('http://localhost:3000/update_table_capacity'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, dynamic>{
-        'table_id': tableId,
+        'id': tableId,
         'capacity': newCapacity,
       }),
     );
