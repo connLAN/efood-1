@@ -46,6 +46,24 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     }
   }
 
+  // update table categories checked status
+  Future<void> _updateCategoryStatus(String categoryId, int isActive) async {
+    final response = await http.put(
+      Uri.parse('http://localhost:3000/update_category_status'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'category_id': categoryId,
+        'is_active': isActive,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update category status');
+    }
+  }
+
   Future<void> _fetchTables() async {
     try {
       final response =
@@ -103,6 +121,8 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                           onChanged: (bool? value) {
                             setState(() {
                               category.is_active = value! ? 1 : 0;
+                              _updateCategoryStatus(
+                                  category.category_id, category.is_active);
                             });
                           },
                         ),
