@@ -1,18 +1,40 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'ordering_page.dart'; // Import the OrderingPage
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Table {
-  final String tableNumber;
-  final String tableNickname;
-  String tableStatus; // Make tableStatus mutable
+  final String id;
+  final String name;
+  final String elegant_name;
+  final int capacity;
+  final String category_id;
+  String table_status;
+
   VoidCallback? orderPlaced; // Add orderPlaced field
 
   Table({
-    required this.tableNumber,
-    required this.tableNickname,
-    required this.tableStatus,
+    required this.id,
+    required this.name,
+    required this.elegant_name,
+    required this.capacity,
+    required this.category_id,
+    required this.table_status,
   });
+
+  factory Table.fromJson(Map<String, dynamic> json) {
+    return Table(
+      id: json['id'],
+      name: json['name'],
+      elegant_name: json['elegant_name'],
+      capacity: json['capacity'],
+      category_id: json['category_id'],
+      table_status: json['table_status'],
+    );
+  }
 }
 
 class TableList {
@@ -23,25 +45,62 @@ class TableList {
   }
 }
 
-int tableAccount = 1;
-
 TableList tableList = TableList();
+
+////////////////////////////////////////
+
+int tableAccount = 1;
 
 void addTables(int tableCount) {
   for (int i = 1; i <= tableCount; i++) {
     tableList.addTable(Table(
-      tableNumber: 'T${tableAccount++}',
-      tableNickname: '桌台 $i',
-      tableStatus: 'Available',
+      id: 'T${tableAccount++}',
+      name: 'Table $i',
+      elegant_name: '桌台 $i',
+      capacity: 4,
+      category_id: 'DT',
+      table_status: 'Available',
     ));
   }
 }
 
-class TableStatus extends StatelessWidget {
+void addTable(Table table) {
+  tableList.addTable(table);
+}
+
+//////////////////////////////////////////
+
+// get tables list from http://localhost/all_tables
+Future getTables() async {
+  try {
+    tableList.tables.clear();
+    final response =
+        await http.get(Uri.parse('http://localhost:3000/tables_all'));
+
+    print(response.statusCode);
+
+    if (response.statusCode == 200) {
+      print(response.body);
+
+      final List<dynamic> data = json.decode(response.body);
+      data.forEach((item) {
+        tableList.addTable(Table.fromJson(item));
+      });
+      print(tableList.tables);
+    } else {
+      throw Exception('Failed to load tables: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error fetching tables: $e');
+    throw Exception('Failed to load tables');
+  }
+}
+
+class Table_status extends StatelessWidget {
   final String status;
   final VoidCallback onNavigate;
 
-  TableStatus({required this.status, required this.onNavigate});
+  Table_status({required this.status, required this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +148,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
   @override
   void initState() {
     super.initState();
+
     loadTableStatuses();
   }
 
@@ -96,23 +156,22 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       for (var table in tableList.tables) {
-        table.tableStatus =
-            prefs.getString('table_status_${table.tableNumber}') ?? 'Available';
+        table.table_status =
+            prefs.getString('table_status_${table.id}') ?? 'Available';
       }
     });
   }
 
   Future<void> saveTableStatus(Table table) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-        'table_status_${table.tableNumber}', table.tableStatus);
+    await prefs.setString('table_status_${table.id}', table.table_status);
   }
 
   Future<void> clearAllOrders() async {
     final prefs = await SharedPreferences.getInstance();
     for (var table in tableList.tables) {
-      await prefs.remove('orders_${table.tableNumber}');
-      await prefs.remove('table_status_${table.tableNumber}');
+      await prefs.remove('orders_${table.id}');
+      await prefs.remove('table_status_${table.id}');
     }
   }
 
@@ -131,7 +190,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
               await clearAllOrders();
               setState(() {
                 for (var table in tableList.tables) {
-                  table.tableStatus = 'Available';
+                  table.table_status = 'Available';
                 }
               });
             },
@@ -150,7 +209,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
           final table = tableList.tables[index];
           Color color;
 
-          switch (table.tableStatus) {
+          switch (table.table_status) {
             case 'Available':
               color = const Color.fromARGB(255, 246, 204, 204);
               break;
@@ -173,7 +232,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
           return GestureDetector(
             onTap: () {
               setState(() {
-                table.tableStatus = 'Open';
+                table.table_status = 'Open';
                 saveTableStatus(table);
               });
 
@@ -181,7 +240,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => OrderingPage(
-                    tableNumber: table.tableNumber, // Correct parameter name
+                    tableNumber: table.id, // Correct parameter name
                     // onOrderPlaced: table.orderPlaced ?? () {},
                   ),
                 ),
@@ -217,7 +276,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
                     ),
                   ),
                   Text(
-                    table.tableNickname,
+                    table.elegant_name,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

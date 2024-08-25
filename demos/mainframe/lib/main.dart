@@ -26,7 +26,9 @@ void main() async {
   await initializeDateFormatting('zh_CN', null);
 
   // Initialize tables
-  addTables(30); // Add 10 tables for example
+  // addTables(10); // Add 10 tables for example
+
+  getTables(); // Get tables from the server
 
   runApp(MyApp());
 }
