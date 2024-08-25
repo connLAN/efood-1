@@ -126,7 +126,7 @@ router.put('/update_table_status', (req, res) => {
 // Add a table
 router.post('/add_table', (req, res) => {
     const { name, status } = req.body;
-    let sql = `INSERT INTO tables (name, id, is_active) VALUES (?, ?, ?)`;
+    let sql = `INSERT INTO tables (name, elegant_name, capacity, category_id) VALUES (?, ?, ?,?)`;
     console.log(`Executing SQL: ${sql}`); // Log the SQL query
     db.query(sql, [name, status], (err, results) => {
         if (err) {
@@ -181,6 +181,21 @@ router.put('/update_table_capacity', (req, res) => {
         res.json(results);
     });
 });
+
+
+// delete table
+router.delete('/delete_table', (req, res) => {
+    const { id } = req.body;
+    let sql = `DELETE FROM tables WHERE id = ${id}`;
+    db.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
+});
+
+
 
 // Catch-all route for unmatched requests
 router.use((req, res) => {

@@ -94,6 +94,24 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
     }
   }
 
+  Future<void> _deleteTable(int id) async {
+    final response = await http.delete(
+      Uri.parse('http://localhost:3000/delete_table'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id': id,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      _fetchTables();
+    } else {
+      throw Exception('删除桌台失败');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,7 +138,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                           value: category.is_active == 1,
                           onChanged: (bool? value) {
                             setState(() {
-                              category.is_active = value! ? 1 : 0;
+                              category.is_active = value == true ? 1 : 0;
                               _updateCategoryStatus(
                                   category.category_id, category.is_active);
                             });
@@ -163,11 +181,23 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                                 controller: _nameControllers[table.id],
                                 decoration: InputDecoration(labelText: '桌名'),
                                 onSubmitted: (newValue) {
-                                  print('Table name changed to $newValue');
-                                  setState(() {
-                                    table.name = newValue;
-                                    _updateTableName(table.id, newValue);
-                                  });
+                                  if (newValue.isNotEmpty) {
+                                    setState(() {
+                                      table.name = newValue;
+                                      _updateTableName(table.id, newValue);
+                                    });
+                                  }
+                                },
+                                onEditingComplete: () {
+                                  print('Editing complete');
+                                  final newValue =
+                                      _nameControllers[table.id]?.text ?? '';
+                                  if (newValue.isNotEmpty) {
+                                    setState(() {
+                                      table.name = newValue;
+                                      _updateTableName(table.id, newValue);
+                                    });
+                                  }
                                 },
                               ),
                             ),
@@ -177,11 +207,27 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                                 controller: _elegantNameControllers[table.id],
                                 decoration: InputDecoration(labelText: '雅称'),
                                 onSubmitted: (newValue) {
-                                  print('Elegant name changed to $newValue');
-                                  setState(() {
-                                    table.elegant_name = newValue;
-                                    _updateTableElegantName(table.id, newValue);
-                                  });
+                                  if (newValue.isNotEmpty) {
+                                    setState(() {
+                                      table.elegant_name = newValue;
+                                      _updateTableElegantName(
+                                          table.id, newValue);
+                                    });
+                                  }
+                                },
+                                onEditingComplete: () {
+                                  print('Editing complete');
+
+                                  final newValue =
+                                      _elegantNameControllers[table.id]?.text ??
+                                          '';
+                                  if (newValue.isNotEmpty) {
+                                    setState(() {
+                                      table.elegant_name = newValue;
+                                      _updateTableElegantName(
+                                          table.id, newValue);
+                                    });
+                                  }
                                 },
                               ),
                             ),
@@ -192,36 +238,41 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                                 decoration: InputDecoration(labelText: '座位数'),
                                 keyboardType: TextInputType.number,
                                 onSubmitted: (newValue) {
-                                  setState(() {
-                                    table.capacity = int.parse(newValue);
-                                    _updateTableCapacity(
-                                        table.id, int.parse(newValue));
-                                  });
+                                  if (newValue.isNotEmpty) {
+                                    setState(() {
+                                      table.capacity = int.parse(newValue);
+                                      _updateTableCapacity(
+                                          table.id, int.parse(newValue));
+                                    });
+                                  }
+                                },
+                                onEditingComplete: () {
+                                  print('Editing complete');
+
+                                  final newValue =
+                                      _capacityControllers[table.id]?.text ??
+                                          '';
+                                  if (newValue.isNotEmpty) {
+                                    setState(() {
+                                      table.capacity = int.parse(newValue);
+                                      _updateTableCapacity(
+                                          table.id, int.parse(newValue));
+                                    });
+                                  }
                                 },
                               ),
                             ),
-
-                            // expanded button
-                            // if no info changed, just add a delete btn
-                            // if info changed, add a check btn
-                            SizedBox(height: 10),
+                            SizedBox(width: 10),
                             Expanded(
-                              child: table.isChanged
-                                  ? IconButton(
-                                      icon: Icon(Icons.check),
-                                      onPressed: () {
-                                        // Handle check button press
-                                        print('Check button pressed');
-                                      },
-                                    )
-                                  : IconButton(
-                                      icon: Icon(Icons.delete),
-                                      onPressed: () {
-                                        // Handle delete button press
-                                        print('Delete button pressed');
-                                      },
-                                    ),
-                            ),
+                              child: IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () {
+                                  setState(() {
+                                    _deleteTable(table.id);
+                                  });
+                                },
+                              ),
+                            )
                           ],
                         ),
                       );
@@ -399,6 +450,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
         'name': tableName,
         'elegant_name': elegantName,
         'capacity': capacity,
+        'category_id': _selectedCategory!.category_id,
       }),
     );
 
