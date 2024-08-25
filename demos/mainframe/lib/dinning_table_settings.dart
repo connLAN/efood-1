@@ -16,11 +16,25 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
   Map<int, TextEditingController> _elegantNameControllers = {};
   Map<int, TextEditingController> _capacityControllers = {};
 
+  // define focus node
+  Map<int, FocusNode> _nameFocusNodes = {};
+  Map<int, FocusNode> _elegantNameFocusNodes = {};
+  Map<int, FocusNode> _capacityFocusNodes = {};
+
   @override
   void initState() {
     super.initState();
     _fetchTableCategories();
     _fetchTables();
+  }
+
+  // dispose()
+  @override
+  void dispose() {
+    _nameFocusNodes.values.forEach((focusNode) => focusNode.dispose());
+    _elegantNameFocusNodes.values.forEach((focusNode) => focusNode.dispose());
+    _capacityFocusNodes.values.forEach((focusNode) => focusNode.dispose());
+    super.dispose();
   }
 
   Future<void> _fetchTableCategories() async {
@@ -84,6 +98,15 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
             for (var table in _tables)
               table.id: TextEditingController(text: table.capacity.toString())
           };
+
+          for (var table in _tables) {
+            // _nameControllers[table.id] = TextEditingController(text: table.name);
+            // _elegantNameControllers[table.id] = TextEditingController(text: table.elegant_name);
+            // _capacityControllers[table.id] = TextEditingController(text: table.capacity.toString());
+            _nameFocusNodes[table.id] = FocusNode();
+            _elegantNameFocusNodes[table.id] = FocusNode();
+            _capacityFocusNodes[table.id] = FocusNode();
+          }
         });
       } else {
         throw Exception('Failed to load tables: ${response.statusCode}');
@@ -92,6 +115,12 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
       print('Error fetching tables: $e');
       throw Exception('Failed to load tables');
     }
+  }
+
+  void triggerEditingComplete(int tableId) {
+    // Request focus and then unfocus to trigger onEditingComplete
+    _elegantNameFocusNodes[tableId]?.requestFocus();
+    _elegantNameFocusNodes[tableId]?.unfocus();
   }
 
   Future<void> _deleteTable(int id) async {
@@ -179,6 +208,7 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                             Expanded(
                               child: TextField(
                                 controller: _nameControllers[table.id],
+                                // focusnode: _nameFocusNodes[table.id],
                                 decoration: InputDecoration(labelText: '桌名'),
                                 onSubmitted: (newValue) {
                                   if (newValue.isNotEmpty) {
