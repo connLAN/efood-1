@@ -205,6 +205,10 @@ class _DinningTableSettingsState extends State<DinningTableSettings> {
                       return ListTile(
                         title: Row(
                           children: [
+                            // add sequence number
+                            Text('${index + 1}'),
+                            SizedBox(width: 10),
+
                             Expanded(
                               child: TextField(
                                 controller: _nameControllers[table.id],
