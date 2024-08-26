@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class Table {
-  final String id;
+  final int id;
   final String name;
   final String elegant_name;
   final int capacity;
@@ -27,12 +27,12 @@ class Table {
 
   factory Table.fromJson(Map<String, dynamic> json) {
     return Table(
-      id: json['id'],
+      id: json['id'] ?? 0,
       name: json['name'],
       elegant_name: json['elegant_name'],
-      capacity: json['capacity'],
+      capacity: json['capacity'] ?? 0,
       category_id: json['category_id'],
-      table_status: json['table_status'],
+      table_status: 'available',
     );
   }
 }
@@ -51,22 +51,22 @@ TableList tableList = TableList();
 
 int tableAccount = 1;
 
-void addTables(int tableCount) {
-  for (int i = 1; i <= tableCount; i++) {
-    tableList.addTable(Table(
-      id: 'T${tableAccount++}',
-      name: 'Table $i',
-      elegant_name: '桌台 $i',
-      capacity: 4,
-      category_id: 'DT',
-      table_status: 'Available',
-    ));
-  }
-}
+// void addTables(int tableCount) {
+//   for (int i = 1; i <= tableCount; i++) {
+//     tableList.addTable(Table(
+//       id: 'T${tableAccount++}',
+//       name: 'Table $i',
+//       elegant_name: '桌台 $i',
+//       capacity: 4,
+//       category_id: 'DT',
+//       table_status: 'Available',
+//     ));
+//   }
+// }
 
-void addTable(Table table) {
-  tableList.addTable(table);
-}
+// void addTable(Table table) {
+//   tableList.addTable(table);
+// }
 
 //////////////////////////////////////////
 
@@ -240,7 +240,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => OrderingPage(
-                    tableNumber: table.id, // Correct parameter name
+                    tableNumber: table.name, // Correct parameter name
                     // onOrderPlaced: table.orderPlaced ?? () {},
                   ),
                 ),
