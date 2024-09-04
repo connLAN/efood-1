@@ -196,6 +196,21 @@ router.delete('/delete_table', (req, res) => {
 });
 
 
+// get menu items from menu table
+router.get('/get_menu', (req, res) => {
+    let sql = `SELECT * FROM menu ORDER BY CategoryID`;
+    db.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        // console.log(results);
+        res.json(results);
+    }
+    );
+});
+
+
 
 // Catch-all route for unmatched requests
 router.use((req, res) => {

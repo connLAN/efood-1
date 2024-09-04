@@ -1,14 +1,5 @@
 import 'package:flutter/material.dart';
-import 'icons_page.dart'; // Import the IconsPage class
-import 'dinning_table.dart'; // Import the DinningTablesPage class
-import 'new_page.dart'; // Import the NewPage class
-
-void onPressed(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => NewPage()),
-  );
-}
+import 'dinning_table.dart'; // Ensure this import is present
 
 void handlePersonOutlinePressed(BuildContext context) {
   print('Person Outline Icon pressed');
@@ -30,6 +21,26 @@ void handleDinningTablePressed(BuildContext context) {
   print('Dinning Table Icon pressed');
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => DinningTablesPage()),
+    MaterialPageRoute(
+      builder: (context) => DinningTablesPage(
+          // groupedMenuItems: {}, // Provide appropriate data
+          // menu: [], // Provide appropriate data
+          ),
+    ),
   );
+}
+
+// Placeholder for NewPage class
+class NewPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('New Page'),
+      ),
+      body: Center(
+        child: Text('This is a new page'),
+      ),
+    );
+  }
 }

@@ -19,6 +19,7 @@ dependencies:
   flutter_local_notifications: ^8.2.0
   http: ^0.13.3
   pinyin: ^3.3.0
+  collection: ^1.15.0
 
 
 dev_dependencies:

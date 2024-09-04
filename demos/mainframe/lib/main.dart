@@ -5,6 +5,7 @@ import 'icons_page.dart'; // Import the IconsPage
 import 'utils.dart'; // Import utility functions
 import 'clock.dart'; // Import the Clock widget
 import 'dinning_table.dart'; // Import the DinningTablesPage
+import 'ordering_page.dart'; // Import the OrderingPage
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,7 @@ void main() async {
   // addTables(10); // Add 10 tables for example
 
   getTables(); // Get tables from the server
+  // load_menu(); // Load menu from the server
 
   runApp(MyApp());
 }

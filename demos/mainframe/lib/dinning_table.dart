@@ -1,175 +1,122 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'ordering_page.dart'; // Import the OrderingPage
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'ordering_page.dart';
+import 'dinning_table.dart';
 
 class Table {
-  final int id;
-  final String name;
-  final String elegant_name;
-  final int capacity;
-  final String category_id;
+  final String id;
   String table_status;
 
-  VoidCallback? orderPlaced; // Add orderPlaced field
-
-  Table({
-    required this.id,
-    required this.name,
-    required this.elegant_name,
-    required this.capacity,
-    required this.category_id,
-    required this.table_status,
-  });
-
-  factory Table.fromJson(Map<String, dynamic> json) {
-    return Table(
-      id: json['id'] ?? 0,
-      name: json['name'],
-      elegant_name: json['elegant_name'],
-      capacity: json['capacity'] ?? 0,
-      category_id: json['category_id'],
-      table_status: 'available',
-    );
-  }
+  Table({required this.id, this.table_status = 'Available'});
 }
 
 class TableList {
-  final List<Table> tables = [];
+  final List<Table> tables;
 
-  void addTable(Table table) {
-    tables.add(table);
-  }
+  TableList({required this.tables});
 }
 
-TableList tableList = TableList();
+class TableCategory {
+  final int id;
+  final String category_id;
+  final String name;
+  final TableList table_list;
 
-////////////////////////////////////////
+  TableCategory(
+      {required this.id,
+      required this.category_id,
+      required this.name,
+      required this.table_list});
+}
 
-int tableAccount = 1;
+class TableCategoryList {
+  final List<TableCategory> tableCategories;
 
-// void addTables(int tableCount) {
-//   for (int i = 1; i <= tableCount; i++) {
-//     tableList.addTable(Table(
-//       id: 'T${tableAccount++}',
-//       name: 'Table $i',
-//       elegant_name: '桌台 $i',
-//       capacity: 4,
-//       category_id: 'DT',
-//       table_status: 'Available',
-//     ));
-//   }
-// }
+  TableCategoryList({required this.tableCategories});
+}
 
-// void addTable(Table table) {
-//   tableList.addTable(table);
-// }
-
-//////////////////////////////////////////
-
-// get tables list from http://localhost/all_tables
-Future getTables() async {
-  try {
-    tableList.tables.clear();
-    final response =
-        await http.get(Uri.parse('http://localhost:3000/tables_all'));
-
-    print(response.statusCode);
-
-    if (response.statusCode == 200) {
-      print(response.body);
-
-      final List<dynamic> data = json.decode(response.body);
-      data.forEach((item) {
-        tableList.addTable(Table.fromJson(item));
-      });
-      print(tableList.tables);
-    } else {
-      throw Exception('Failed to load tables: ${response.statusCode}');
+// get tables from localhost:3000/tables
+// first get table category, each categoryid has a list of tableid
+Future<TableCategoryList> getTableCategory() async {
+  final response =
+      await http.get(Uri.parse('http://localhost:3000/table_category'));
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    List<TableCategory> tableCategories = [];
+    for (var category in data) {
+      tableCategories.add(TableCategory(
+        id: category['id'],
+        name: category['name'],
+        category_id: category['category_id'],
+        table_list: TableList(tables: await tablesFromCategory(category['id'])),
+      ));
     }
-  } catch (e) {
-    print('Error fetching tables: $e');
-    throw Exception('Failed to load tables');
+    return TableCategoryList(tableCategories: tableCategories);
+  } else {
+    throw Exception('Failed to load table categories');
   }
 }
 
-class Table_status extends StatelessWidget {
-  final String status;
-  final VoidCallback onNavigate;
-
-  Table_status({required this.status, required this.onNavigate});
-
-  @override
-  Widget build(BuildContext context) {
-    Color color = Colors.grey;
-    switch (status) {
-      case 'Available':
-        color = const Color.fromARGB(255, 246, 246, 246);
-        break;
-      case 'Reserved':
-        color = Colors.yellow;
-        break;
-      case 'Occupied':
-        color = Colors.red;
-        break;
-      case 'Cleaning':
-        color = Colors.blue;
-        break;
-      case 'Maintenance':
-        color = Colors.purple;
-        break;
-      default:
-        color = const Color.fromARGB(255, 233, 231, 109);
+// Define the tablesFromCategory method
+Future<List<Table>> tablesFromCategory(String categoryId) async {
+  final response = await http
+      .get(Uri.parse('http://localhost:3000/tables?category_id=$categoryId'));
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    List<Table> tables = [];
+    for (var table in data) {
+      tables.add(Table(
+        id: table['id'],
+        table_status: table['table_status'],
+      ));
     }
-    return GestureDetector(
-      onTap: onNavigate,
-      child: Container(
-        color: color,
-        child: Center(
-          child: Text(
-            status,
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-    );
+    return tables;
+  } else {
+    throw Exception('Failed to load tables for category $categoryId');
   }
 }
 
-class DinningTablesPage extends StatefulWidget {
-  @override
-  _DinningTablesPageState createState() => _DinningTablesPageState();
-}
+// then get table status for each tableid
 
-class _DinningTablesPageState extends State<DinningTablesPage> {
-  @override
-  void initState() {
-    super.initState();
-
-    loadTableStatuses();
-  }
-
-  Future<void> loadTableStatuses() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      for (var table in tableList.tables) {
-        table.table_status =
-            prefs.getString('table_status_${table.id}') ?? 'Available';
+Future<TableList> getTables() async {
+  final prefs = await SharedPreferences.getInstance();
+  List<Table> tables = [];
+  final response = await http.get(Uri.parse('http://localhost:3000/tables'));
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    for (var category in data) {
+      for (var tableId in category['tables']) {
+        String? status =
+            prefs.getString('table_status_$tableId') ?? 'Available';
+        tables.add(Table(id: tableId, table_status: status));
       }
-    });
+    }
   }
+  return TableList(tables: tables);
+}
 
-  Future<void> saveTableStatus(Table table) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('table_status_${table.id}', table.table_status);
-  }
+class DinningTable extends StatefulWidget {
+  final TableList tableList = TableList(tables: []);
+  final Map<String, List<Map<String, dynamic>>> groupedMenuItems = {};
+  final List<Map<String, dynamic>> menu = [];
 
+  DinningTable(
+      // {required this.tableList,
+      // required this.groupedMenuItems,
+      // required this.menu}
+      );
+
+  @override
+  _DinningTableState createState() => _DinningTableState();
+}
+
+class _DinningTableState extends State<DinningTable> {
   Future<void> clearAllOrders() async {
     final prefs = await SharedPreferences.getInstance();
-    for (var table in tableList.tables) {
+    for (var table in widget.tableList.tables) {
       await prefs.remove('orders_${table.id}');
       await prefs.remove('table_status_${table.id}');
     }
@@ -189,7 +136,7 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
             onPressed: () async {
               await clearAllOrders();
               setState(() {
-                for (var table in tableList.tables) {
+                for (var table in widget.tableList.tables) {
                   table.table_status = 'Available';
                 }
               });
@@ -198,97 +145,74 @@ class _DinningTablesPageState extends State<DinningTablesPage> {
         ],
       ),
       body: GridView.builder(
-        padding: EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 6,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+          crossAxisCount: 4,
+          crossAxisSpacing: 4.0,
+          mainAxisSpacing: 4.0,
         ),
-        itemCount: tableList.tables.length,
+        itemCount: widget.tableList.tables.length,
         itemBuilder: (context, index) {
-          final table = tableList.tables[index];
-          Color color;
-
-          switch (table.table_status) {
-            case 'Available':
-              color = const Color.fromARGB(255, 246, 204, 204);
-              break;
-            case 'Reserved':
-              color = Colors.yellow;
-              break;
-            case 'Occupied':
-              color = Colors.red;
-              break;
-            case 'Cleaning':
-              color = Colors.blue;
-              break;
-            case 'Maintenance':
-              color = Colors.purple;
-              break;
-            default:
-              color = const Color.fromARGB(255, 129, 169, 122);
-          }
-
+          var table = widget.tableList.tables[index];
           return GestureDetector(
             onTap: () {
-              setState(() {
-                table.table_status = 'Open';
-                saveTableStatus(table);
-              });
-
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => OrderingPage(
-                    tableNumber: table.name, // Correct parameter name
-                    // onOrderPlaced: table.orderPlaced ?? () {},
+                    table_name: table.id,
+                    groupedMenuItems: widget.groupedMenuItems,
+                    menu: widget.menu,
                   ),
                 ),
-              ).then((_) {
-                setState(() {
-                  // Update the state when coming back from the OrderingPage
-                });
-              });
+              );
             },
             child: Container(
               decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8.0),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: itemSize,
-                    height: itemSize,
-                    child: FractionallySizedBox(
-                      widthFactor: 0.6,
-                      heightFactor: 0.6,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/dinning-table.jpg'),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Table ${table.id}',
+                      style: TextStyle(
+                          fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  Text(
-                    table.elegant_name,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      backgroundColor: color.withOpacity(0.7),
+                    Text(
+                      table.table_status,
+                      style: TextStyle(fontSize: 16.0, color: Colors.green),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class DinningTablesPage extends StatelessWidget {
+  // just a print
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<TableCategoryList>(
+      future: getTableCategory(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return DinningTable(
+              // tableList: snapshot.data!.tableCategories[0].table_list,
+              // groupedMenuItems: {},
+              // menu: [],
+              );
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        }
+        return CircularProgressIndicator();
+      },
     );
   }
 }

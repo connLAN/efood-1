@@ -6,11 +6,13 @@ import 'clock.dart'; // Import the Clock widget
 import 'emplyee_page.dart';
 import 'emplyee_settings.dart';
 import 'dishes_settings.dart';
+
+import 'dinning_table.dart'; // Import the DinningTable widget
 import 'dinning_table_settings.dart'; // Import the DiningTableSettingsPage
 import 'print_settings.dart'; // Import the PrintSettingsPage
 import 'store_settings.dart'; // Import the PrintSettingsPage
 import 'network_settings.dart'; // Import the NetworkSettingsPage
-import 'settings.dart'; // Import the CommonSettingsPage
+import 'settings.dart'; // Import the CommonSettingsPagez
 
 /////////////////////
 
@@ -41,6 +43,40 @@ class _IconsPageState extends State<IconsPage> {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  void _onPressed() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Button pressed')),
+    );
+  }
+
+  void _onRightClick() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Button right-clicked')),
+    );
+  }
+
+  void handleEmployeePressed(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Employee button pressed')),
+    );
+  }
+
+  void handleDinningTablePressed(BuildContext context) {
+    DinningTablesPage();
+  }
+
+  void handlePersonOutlinePressed(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Person outline button pressed')),
+    );
+  }
+
+  void onSettingsIconClicked(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Settings icon clicked')),
+    );
   }
 
   @override
@@ -112,14 +148,14 @@ class _IconsPageState extends State<IconsPage> {
             icon: Icon(Icons.settings),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //       builder: (context) => CommonSettingsPage(
-              //             shopName: '招财猫3',
-              //             bannerImage: 'assets/3.jpg',
-              //           )),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CommonSettingsPage(
+                          shopName: '招财猫3',
+                          bannerImage: 'assets/3.jpg',
+                        )),
+              );
               onSettingsIconClicked(context);
             },
           ),
@@ -153,7 +189,7 @@ class _IconsPageState extends State<IconsPage> {
           Icon(Icons.restaurant, size: buttonSize * 0.4),
           '门店信息',
           Colors.lightBlueAccent,
-          () => onPressed(context),
+          _onPressed,
           () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => StoreSettingsPage()),
@@ -202,7 +238,7 @@ class _IconsPageState extends State<IconsPage> {
               height: buttonSize * 0.4),
           '菜品管理',
           Colors.cyanAccent,
-          () => onPressed(context),
+          _onPressed,
           () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => DishesSettingsPage()),
@@ -212,7 +248,7 @@ class _IconsPageState extends State<IconsPage> {
           Icon(Icons.thumb_down, size: buttonSize * 0.4),
           'Thumb Down',
           Colors.purpleAccent,
-          () => onPressed(context),
+          _onPressed,
           () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
@@ -222,7 +258,7 @@ class _IconsPageState extends State<IconsPage> {
           Icon(Icons.trending_up, size: buttonSize * 0.4),
           '报表',
           Colors.orangeAccent,
-          () => onPressed(context),
+          _onPressed,
           () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
@@ -232,7 +268,7 @@ class _IconsPageState extends State<IconsPage> {
           Icon(Icons.receipt, size: buttonSize * 0.4),
           '订单',
           const Color.fromARGB(255, 246, 199, 248),
-          () => onPressed(context),
+          _onPressed,
           () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
