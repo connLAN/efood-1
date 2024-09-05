@@ -44,23 +44,28 @@ class TableCategoryList {
 
 // get tables from localhost:3000/tables
 // first get table category, each categoryid has a list of tableid
-Future<TableCategoryList> getTableCategory1() async {
+Future<TableCategoryList> getTableCategory() async {
   final response =
       await http.get(Uri.parse('http://localhost:3000/table_category_all'));
 
-  print('getTableCategory1 ... ... ');
+  print('getTableCategory ... ... ');
   print(response.statusCode);
   print(response.body);
 
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
     List<TableCategory> tableCategories = [];
+
     for (var category in data) {
+      print('category: $category');
+      print('category_id: ${category['category_id']}');
+      final String categoryId = category['category_id'];
+
       tableCategories.add(TableCategory(
         id: category['id'],
         name: category['name'],
         category_id: category['category_id'],
-        table_list: TableList(tables: await tablesFromCategory(category['id'])),
+        table_list: TableList(tables: await tablesFromCategory(categoryId)),
       ));
     }
     return TableCategoryList(tableCategories: tableCategories);
@@ -69,7 +74,7 @@ Future<TableCategoryList> getTableCategory1() async {
   }
 }
 
-Future<TableCategoryList> getTableCategory() async {
+Future<TableCategoryList> getTableCategory0() async {
   print('getTableCategory called');
   try {
     // Simulate a network call or database query
@@ -114,6 +119,7 @@ Future<TableCategoryList> getTableCategory() async {
 
 // Define the tablesFromCategory method
 Future<List<Table>> tablesFromCategory(String categoryId) async {
+  print('tablesFromCategory called with categoryId: $categoryId');
   final response = await http
       .get(Uri.parse('http://localhost:3000/tables?category_id=$categoryId'));
 
@@ -282,7 +288,7 @@ class _DinningTableState extends State<DinningTable> {
   }
 }
 
-class DinningTablesPage1 extends StatelessWidget {
+class DinningTablesPage extends StatelessWidget {
   DinningTablesPage() {
     print('DinningTablesPage ... ... ');
   }
@@ -293,18 +299,24 @@ class DinningTablesPage1 extends StatelessWidget {
       future: getTableCategory(),
       builder: (context, snapshot) {
         print('FutureBuilder state: ${snapshot.connectionState}');
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           print('Loading...');
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.connectionState == ConnectionState.done) {
+          print('snapshot.hasData = ${snapshot.hasData}');
+
           if (snapshot.hasData) {
             print('Data received: ${snapshot.data}');
             return DinningTable(
               tableCategories: snapshot.data!.tableCategories,
             );
           } else if (snapshot.hasError) {
+            print('Error:  0000');
             print('Error: ${snapshot.error}');
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+                child: Text(
+                    'Failed to load table categories. Please try again later.'));
           }
         }
         print('Unexpected state: ${snapshot.connectionState}');
@@ -315,7 +327,7 @@ class DinningTablesPage1 extends StatelessWidget {
   }
 }
 
-class DinningTablesPage extends StatelessWidget {
+class DinningTablesPage0 extends StatelessWidget {
   @override
   build(BuildContext context) {
     return Scaffold(
