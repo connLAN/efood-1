@@ -29,7 +29,7 @@ void main() async {
   // Initialize tables
   // addTables(10); // Add 10 tables for example
 
-  getTables(); // Get tables from the server
+  // getTables(); // Get tables from the server
   // load_menu(); // Load menu from the server
 
   runApp(MyApp());

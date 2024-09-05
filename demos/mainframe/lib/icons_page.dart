@@ -46,21 +46,21 @@ class _IconsPageState extends State<IconsPage> {
     super.dispose();
   }
 
-  void _onPressed() {
+  void _onPressed(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => HelpPage()),
     );
   }
 
-  void _onRightClick() {
+  void _onRightClick(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => NetworkPage()),
     );
   }
 
-  void handleStorePressed() {
+  void handleStorePressed(BuildContext context) {
     print(getFunctionName());
     Navigator.push(
       context,
@@ -68,7 +68,7 @@ class _IconsPageState extends State<IconsPage> {
     );
   }
 
-  void handleEmployeePressed() {
+  void handleEmployeePressed(BuildContext context) {
     print(getFunctionName());
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -76,11 +76,11 @@ class _IconsPageState extends State<IconsPage> {
     );
   }
 
-  void handleDinningTablePressed() {
-    print('Dinning Table Icon pressed');
-    print(getFunctionName());
-    DinningTablesPage(); //
-  }
+  // void handleDinningTablePressed(BuildContext context) {
+  //   print('Dinning Table Icon pressed');
+  //   print(getFunctionName());
+  //   DinningTablesPage(); //
+  // }
 
   void handlePersonOutlinePressed(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -208,11 +208,16 @@ class _IconsPageState extends State<IconsPage> {
           Icon(Icons.restaurant, size: buttonSize * 0.4),
           '门店信息',
           Colors.lightBlueAccent,
-          handleStorePressed,
-          _onRightClick,
+          () => handleStorePressed(context),
+          () => _onRightClick(context),
           buttonSize),
-      _createIconItem(Icon(Icons.people, size: buttonSize * 0.4), '员工',
-          Colors.lightGreenAccent, _onPressed, _onRightClick, buttonSize),
+      _createIconItem(
+          Icon(Icons.people, size: buttonSize * 0.4),
+          '员工',
+          Colors.lightGreenAccent,
+          () => _onPressed(context),
+          () => _onRightClick(context),
+          buttonSize),
       _createIconItem(
           Image(
               image: AssetImage('assets/dinning-table.jpg'),
@@ -220,8 +225,8 @@ class _IconsPageState extends State<IconsPage> {
               height: buttonSize * 0.4),
           '桌台',
           Color.fromARGB(255, 197, 140, 179),
-          handleDinningTablePressed,
-          _onRightClick,
+          () => handleDinningTablePressed(context),
+          () => _onRightClick(context),
           buttonSize),
       _createIconItem(
           Image(
@@ -230,8 +235,8 @@ class _IconsPageState extends State<IconsPage> {
               height: buttonSize * 0.4),
           'V.I.P 会员',
           Color.fromARGB(255, 222, 233, 6),
-          _onPressed,
-          _onRightClick,
+          () => _onPressed(context),
+          () => _onRightClick(context),
           buttonSize),
       _createIconItem(
           Image(
@@ -240,24 +245,29 @@ class _IconsPageState extends State<IconsPage> {
               height: buttonSize * 0.4),
           '菜品管理',
           Colors.cyanAccent,
-          _onPressed,
-          _onRightClick,
+          () => _onPressed(context),
+          () => _onRightClick(context),
           buttonSize),
       _createIconItem(
           Icon(Icons.thumb_down, size: buttonSize * 0.4),
           'Thumb Down',
           Colors.purpleAccent,
-          _onPressed,
-          _onRightClick,
+          () => _onPressed(context),
+          () => _onRightClick(context),
           buttonSize),
-      _createIconItem(Icon(Icons.trending_up, size: buttonSize * 0.4), '报表',
-          Colors.orangeAccent, _onPressed, _onRightClick, buttonSize),
+      _createIconItem(
+          Icon(Icons.trending_up, size: buttonSize * 0.4),
+          '报表',
+          Colors.orangeAccent,
+          () => _onPressed(context),
+          () => _onRightClick(context),
+          buttonSize),
       _createIconItem(
           Icon(Icons.receipt, size: buttonSize * 0.4),
           '订单',
           const Color.fromARGB(255, 246, 199, 248),
-          _onPressed,
-          _onRightClick,
+          () => _onPressed(context),
+          () => _onRightClick(context),
           buttonSize),
     ];
   }

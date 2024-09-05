@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'package:ZCM/emplyee_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'utils.dart';
 import 'ordering_page.dart';
 import 'dinning_table.dart';
+import 'new_page.dart';
 
 class Table {
   final String id;
@@ -40,9 +44,14 @@ class TableCategoryList {
 
 // get tables from localhost:3000/tables
 // first get table category, each categoryid has a list of tableid
-Future<TableCategoryList> getTableCategory() async {
+Future<TableCategoryList> getTableCategory1() async {
   final response =
-      await http.get(Uri.parse('http://localhost:3000/table_category'));
+      await http.get(Uri.parse('http://localhost:3000/table_category_all'));
+
+  print('getTableCategory1 ... ... ');
+  print(response.statusCode);
+  print(response.body);
+
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
     List<TableCategory> tableCategories = [];
@@ -60,10 +69,58 @@ Future<TableCategoryList> getTableCategory() async {
   }
 }
 
+Future<TableCategoryList> getTableCategory() async {
+  print('getTableCategory called');
+  try {
+    // Simulate a network call or database query
+    await Future.delayed(Duration(seconds: 2)); // Simulate delay
+    print('getTableCategory delay completed');
+
+    // Return a dummy TableCategoryList for testing
+    TableCategoryList tableCategoryList = TableCategoryList(tableCategories: [
+      TableCategory(
+          id: 1,
+          name: 'Category 1',
+          category_id: '1',
+          table_list: TableList(
+            tables: [
+              Table(id: '1', table_status: 'Available'),
+              Table(id: '2', table_status: 'Occupied'),
+              Table(id: '3', table_status: 'Available'),
+              Table(id: '4', table_status: 'Occupied')
+            ],
+          )),
+      TableCategory(
+          id: 2,
+          name: 'Category 2',
+          category_id: '2',
+          table_list: TableList(
+            tables: [
+              Table(id: '5', table_status: 'Available'),
+              Table(id: '6', table_status: 'Occupied'),
+              Table(id: '7', table_status: 'Available'),
+              Table(id: '8', table_status: 'Occupied')
+            ],
+          )),
+    ]);
+
+    print('getTableCategory returning data: $tableCategoryList');
+    return tableCategoryList;
+  } catch (e) {
+    print('Error in getTableCategory: $e');
+    rethrow;
+  }
+}
+
 // Define the tablesFromCategory method
 Future<List<Table>> tablesFromCategory(String categoryId) async {
   final response = await http
       .get(Uri.parse('http://localhost:3000/tables?category_id=$categoryId'));
+
+  print('tablesFromCategory ... ... ');
+  print(response.statusCode);
+  print(response.body);
+
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
     List<Table> tables = [];
@@ -73,6 +130,9 @@ Future<List<Table>> tablesFromCategory(String categoryId) async {
         table_status: table['table_status'],
       ));
     }
+
+    print(tables);
+
     return tables;
   } else {
     throw Exception('Failed to load tables for category $categoryId');
@@ -80,11 +140,16 @@ Future<List<Table>> tablesFromCategory(String categoryId) async {
 }
 
 // then get table status for each tableid
-
 Future<TableList> getTables() async {
   final prefs = await SharedPreferences.getInstance();
   List<Table> tables = [];
-  final response = await http.get(Uri.parse('http://localhost:3000/tables'));
+  final response =
+      await http.get(Uri.parse('http://localhost:3000/tables_all'));
+
+  print('getTables ... ... ');
+  print(response.statusCode);
+  print(response.body);
+
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
     for (var category in data) {
@@ -95,6 +160,9 @@ Future<TableList> getTables() async {
       }
     }
   }
+
+  print(tables);
+
   return TableList(tables: tables);
 }
 
@@ -214,9 +282,9 @@ class _DinningTableState extends State<DinningTable> {
   }
 }
 
-class DinningTablesPage extends StatelessWidget {
+class DinningTablesPage1 extends StatelessWidget {
   DinningTablesPage() {
-    print('Beginning of Dinning Tables Page');
+    print('DinningTablesPage ... ... ');
   }
 
   @override
@@ -224,15 +292,58 @@ class DinningTablesPage extends StatelessWidget {
     return FutureBuilder<TableCategoryList>(
       future: getTableCategory(),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return DinningTable(
-            tableCategories: snapshot.data!.tableCategories,
-          );
-        } else if (snapshot.hasError) {
-          return Text('${snapshot.error}');
+        print('FutureBuilder state: ${snapshot.connectionState}');
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          print('Loading...');
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData) {
+            print('Data received: ${snapshot.data}');
+            return DinningTable(
+              tableCategories: snapshot.data!.tableCategories,
+            );
+          } else if (snapshot.hasError) {
+            print('Error: ${snapshot.error}');
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
         }
-        return CircularProgressIndicator();
+        print('Unexpected state: ${snapshot.connectionState}');
+        return Center(
+            child: Text('Unexpected state: ${snapshot.connectionState}'));
       },
     );
+  }
+}
+
+class DinningTablesPage extends StatelessWidget {
+  @override
+  build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Dinning Tables'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            print('Dinning Tables button pressed');
+          },
+          child: Text('Dinning Tables'),
+        ),
+      ),
+    );
+  }
+}
+
+void handleDinningTablePressed(BuildContext context) {
+  print('Dinning Table Icon pressed aaaa');
+  try {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DinningTablesPage()),
+    ).then((_) {
+      print('Navigation to DinningTablesPage completed');
+    });
+  } catch (e) {
+    print('Error during navigation: $e');
   }
 }

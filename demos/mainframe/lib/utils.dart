@@ -7,8 +7,9 @@ String getFunctionName() {
     throw Exception();
   } catch (e, stackTrace) {
     var traceString = stackTrace.toString().split('\n')[1];
-    var functionName = traceString.split(' ')[3];
-    return functionName;
+    var functionName =
+        RegExp(r'#1\s+([^\s]+)\s+\(').firstMatch(traceString)?.group(1);
+    return functionName ?? 'Unknown';
   }
 }
 
@@ -35,31 +36,3 @@ void handleEmployeePressed(BuildContext context) {
     MaterialPageRoute(builder: (context) => NewPage()),
   );
 }
-
-void handleDinningTablePressed(BuildContext context) {
-  print('Dinning Table Icon pressed');
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => DinningTablesPage(
-          // groupedMenuItems: {}, // Provide appropriate data
-          // menu: [], // Provide appropriate data
-          ),
-    ),
-  );
-}
-
-// // Placeholder for NewPage class
-// class NewPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('New Page'),
-//       ),
-//       body: Center(
-//         child: Text('This is a new page'),
-//       ),
-//     );
-//   }
-// }
