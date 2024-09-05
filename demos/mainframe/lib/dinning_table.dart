@@ -99,15 +99,9 @@ Future<TableList> getTables() async {
 }
 
 class DinningTable extends StatefulWidget {
-  final TableList tableList = TableList(tables: []);
-  final Map<String, List<Map<String, dynamic>>> groupedMenuItems = {};
-  final List<Map<String, dynamic>> menu = [];
+  final List<TableCategory> tableCategories;
 
-  DinningTable(
-      // {required this.tableList,
-      // required this.groupedMenuItems,
-      // required this.menu}
-      );
+  DinningTable({required this.tableCategories});
 
   @override
   _DinningTableState createState() => _DinningTableState();
@@ -116,9 +110,11 @@ class DinningTable extends StatefulWidget {
 class _DinningTableState extends State<DinningTable> {
   Future<void> clearAllOrders() async {
     final prefs = await SharedPreferences.getInstance();
-    for (var table in widget.tableList.tables) {
-      await prefs.remove('orders_${table.id}');
-      await prefs.remove('table_status_${table.id}');
+    for (var category in widget.tableCategories) {
+      for (var table in category.table_list.tables) {
+        await prefs.remove('orders_${table.id}');
+        await prefs.remove('table_status_${table.id}');
+      }
     }
   }
 
@@ -136,58 +132,81 @@ class _DinningTableState extends State<DinningTable> {
             onPressed: () async {
               await clearAllOrders();
               setState(() {
-                for (var table in widget.tableList.tables) {
-                  table.table_status = 'Available';
+                for (var category in widget.tableCategories) {
+                  for (var table in category.table_list.tables) {
+                    table.table_status = 'Available';
+                  }
                 }
               });
             },
           ),
         ],
       ),
-      body: GridView.builder(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 4.0,
-          mainAxisSpacing: 4.0,
-        ),
-        itemCount: widget.tableList.tables.length,
-        itemBuilder: (context, index) {
-          var table = widget.tableList.tables[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => OrderingPage(
-                    table_name: table.id,
-                    groupedMenuItems: widget.groupedMenuItems,
-                    menu: widget.menu,
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Table ${table.id}',
-                      style: TextStyle(
-                          fontSize: 18.0, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      table.table_status,
-                      style: TextStyle(fontSize: 16.0, color: Colors.green),
-                    ),
-                  ],
+      body: ListView.builder(
+        itemCount: widget.tableCategories.length,
+        itemBuilder: (context, categoryIndex) {
+          var category = widget.tableCategories[categoryIndex];
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  category.name,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
-            ),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 4.0,
+                  mainAxisSpacing: 4.0,
+                ),
+                itemCount: category.table_list.tables.length,
+                itemBuilder: (context, tableIndex) {
+                  var table = category.table_list.tables[tableIndex];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderingPage(
+                            table_name: table.id,
+                            groupedMenuItems: {}, // Provide appropriate value
+                            menu: [], // Provide appropriate value
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Table ${table.id}',
+                              style: TextStyle(
+                                  fontSize: 18.0, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              table.table_status,
+                              style: TextStyle(
+                                  fontSize: 16.0, color: Colors.green),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           );
         },
       ),
@@ -196,7 +215,10 @@ class _DinningTableState extends State<DinningTable> {
 }
 
 class DinningTablesPage extends StatelessWidget {
-  // just a print
+  DinningTablesPage() {
+    print('Beginning of Dinning Tables Page');
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<TableCategoryList>(
@@ -204,10 +226,8 @@ class DinningTablesPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return DinningTable(
-              // tableList: snapshot.data!.tableCategories[0].table_list,
-              // groupedMenuItems: {},
-              // menu: [],
-              );
+            tableCategories: snapshot.data!.tableCategories,
+          );
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');
         }

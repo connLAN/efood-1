@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'settings.dart'; // Import the CommonSettingsPagez
+import 'new_page.dart'; // Import the NewPage widget
 import 'utils.dart'; // Import utility functions
 import 'help.dart'; // Import the HelpPage
 import 'clock.dart'; // Import the Clock widget
@@ -12,7 +14,6 @@ import 'dinning_table_settings.dart'; // Import the DiningTableSettingsPage
 import 'print_settings.dart'; // Import the PrintSettingsPage
 import 'store_settings.dart'; // Import the PrintSettingsPage
 import 'network_settings.dart'; // Import the NetworkSettingsPage
-import 'settings.dart'; // Import the CommonSettingsPagez
 
 /////////////////////
 
@@ -46,25 +47,39 @@ class _IconsPageState extends State<IconsPage> {
   }
 
   void _onPressed() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Button pressed')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HelpPage()),
     );
   }
 
   void _onRightClick() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Button right-clicked')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NetworkPage()),
     );
   }
 
-  void handleEmployeePressed(BuildContext context) {
+  void handleStorePressed() {
+    print(getFunctionName());
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => StoreSettingsPage()),
+    );
+  }
+
+  void handleEmployeePressed() {
+    print(getFunctionName());
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Employee button pressed')),
     );
   }
 
-  void handleDinningTablePressed(BuildContext context) {
-    DinningTablesPage();
+  void handleDinningTablePressed() {
+    print('Dinning Table Icon pressed');
+    print(getFunctionName());
+    DinningTablesPage(); //
   }
 
   void handlePersonOutlinePressed(BuildContext context) {
@@ -115,6 +130,7 @@ class _IconsPageState extends State<IconsPage> {
         ),
         actions: <Widget>[
           IconButton(
+            // appbar-help
             icon: Icon(Icons.help),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
@@ -125,6 +141,7 @@ class _IconsPageState extends State<IconsPage> {
             },
           ),
           IconButton(
+            // app-bar printer
             icon: Icon(Icons.print),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
@@ -135,6 +152,7 @@ class _IconsPageState extends State<IconsPage> {
             },
           ),
           IconButton(
+            // appbar-network
             icon: Icon(Icons.network_check),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
@@ -145,6 +163,7 @@ class _IconsPageState extends State<IconsPage> {
             },
           ),
           IconButton(
+            // appbar-settings
             icon: Icon(Icons.settings),
             iconSize: 48.0, // Set the icon size to 48.0
             onPressed: () {
@@ -189,22 +208,11 @@ class _IconsPageState extends State<IconsPage> {
           Icon(Icons.restaurant, size: buttonSize * 0.4),
           '门店信息',
           Colors.lightBlueAccent,
-          _onPressed,
-          () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => StoreSettingsPage()),
-              ),
+          handleStorePressed,
+          _onRightClick,
           buttonSize),
-      _createIconItem(
-          Icon(Icons.people, size: buttonSize * 0.4),
-          '员工',
-          Colors.lightGreenAccent,
-          () => handleEmployeePressed(context),
-          () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => EmployeeSettingsPage()),
-              ),
-          buttonSize),
+      _createIconItem(Icon(Icons.people, size: buttonSize * 0.4), '员工',
+          Colors.lightGreenAccent, _onPressed, _onRightClick, buttonSize),
       _createIconItem(
           Image(
               image: AssetImage('assets/dinning-table.jpg'),
@@ -212,11 +220,8 @@ class _IconsPageState extends State<IconsPage> {
               height: buttonSize * 0.4),
           '桌台',
           Color.fromARGB(255, 197, 140, 179),
-          () => handleDinningTablePressed(context),
-          () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DinningTableSettings()),
-              ),
+          handleDinningTablePressed,
+          _onRightClick,
           buttonSize),
       _createIconItem(
           Image(
@@ -225,11 +230,8 @@ class _IconsPageState extends State<IconsPage> {
               height: buttonSize * 0.4),
           'V.I.P 会员',
           Color.fromARGB(255, 222, 233, 6),
-          () => handlePersonOutlinePressed(context),
-          () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HelpPage()),
-              ),
+          _onPressed,
+          _onRightClick,
           buttonSize),
       _createIconItem(
           Image(
@@ -239,40 +241,23 @@ class _IconsPageState extends State<IconsPage> {
           '菜品管理',
           Colors.cyanAccent,
           _onPressed,
-          () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DishesSettingsPage()),
-              ),
+          _onRightClick,
           buttonSize),
       _createIconItem(
           Icon(Icons.thumb_down, size: buttonSize * 0.4),
           'Thumb Down',
           Colors.purpleAccent,
           _onPressed,
-          () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
-              ),
+          _onRightClick,
           buttonSize),
-      _createIconItem(
-          Icon(Icons.trending_up, size: buttonSize * 0.4),
-          '报表',
-          Colors.orangeAccent,
-          _onPressed,
-          () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
-              ),
-          buttonSize),
+      _createIconItem(Icon(Icons.trending_up, size: buttonSize * 0.4), '报表',
+          Colors.orangeAccent, _onPressed, _onRightClick, buttonSize),
       _createIconItem(
           Icon(Icons.receipt, size: buttonSize * 0.4),
           '订单',
           const Color.fromARGB(255, 246, 199, 248),
           _onPressed,
-          () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NetworkSettingsPage()),
-              ),
+          _onRightClick,
           buttonSize),
     ];
   }
