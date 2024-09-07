@@ -97,11 +97,26 @@ router.get('/tables_all', (req, res) => {
     });
 });
 
-// Get a table
+// Get a table by id
 router.get('/table/:id', (req, res) => {
     let sql = `SELECT * FROM tables WHERE id = ${req.params.id}`;
     db.query(sql, (err, results) => {
         if (err) {
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
+});
+
+// Get tables by category_id
+router.get('/tables', (req, res) => {
+    const category_id = String(req.query.category_id); // Ensure category_id is a string
+    let sql = `SELECT * FROM tables WHERE category_id = ?`;
+    console.log(`Executing SQL: ${sql}`); // Log the SQL query
+    console.log(`Parameters: category_id = ${category_id}`); // Log the parameters
+    db.query(sql, [category_id], (err, results) => {
+        if (err) {
+            console.error(`SQL Error: ${err.sqlMessage}`); // Log the SQL error
             return res.status(500).send(err);
         }
         res.json(results);
@@ -126,7 +141,7 @@ router.put('/update_table_status', (req, res) => {
 // Add a table
 router.post('/add_table', (req, res) => {
     const { name, status } = req.body;
-    let sql = `INSERT INTO tables (name, elegant_name, capacity, category_id) VALUES (?, ?, ?,?)`;
+    let sql = `INSERT INTO tables (name, elegant_name, capacity, category_id) VALUES (?, ?, ?, ?)`;
     console.log(`Executing SQL: ${sql}`); // Log the SQL query
     db.query(sql, [name, status], (err, results) => {
         if (err) {
@@ -182,8 +197,7 @@ router.put('/update_table_capacity', (req, res) => {
     });
 });
 
-
-// delete table
+// Delete table
 router.delete('/delete_table', (req, res) => {
     const { id } = req.body;
     let sql = `DELETE FROM tables WHERE id = ${id}`;
@@ -195,22 +209,16 @@ router.delete('/delete_table', (req, res) => {
     });
 });
 
-
-// get menu items from menu table
+// Get menu items from menu table
 router.get('/get_menu', (req, res) => {
     let sql = `SELECT * FROM menu ORDER BY CategoryID`;
     db.query(sql, (err, results) => {
         if (err) {
             return res.status(500).send(err);
         }
-
-        // console.log(results);
         res.json(results);
-    }
-    );
+    });
 });
-
-
 
 // Catch-all route for unmatched requests
 router.use((req, res) => {

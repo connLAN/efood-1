@@ -289,9 +289,7 @@ class _DinningTableState extends State<DinningTable> {
 }
 
 class DinningTablesPage extends StatelessWidget {
-  DinningTablesPage() {
-    print('DinningTablesPage ... ... ');
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -326,6 +324,13 @@ class DinningTablesPage extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
 
 class DinningTablesPage0 extends StatelessWidget {
   @override
